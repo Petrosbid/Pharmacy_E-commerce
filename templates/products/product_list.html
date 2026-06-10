@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}محصولات | {{ site_name }}{% endblock %}
+{% block data_page %}products{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>محصولات</span>
+    </nav>
+    <h1 class="page-title">فروشگاه محصولات</h1>
+    <p class="page-subtitle">بیش از ۸,۵۰۰ محصول اصل با تضمین کیفیت — فیلتر، مقایسه و خرید آسان</p>
+  </div>
+</section>
+
+<div class="container-main catalog-layout">
+  <aside class="filter-sidebar reveal">
+    <h3 class="filter-group-title">دسته‌بندی</h3>
+    <div class="filter-group">
+      {% for category in all_categories %}
+      <label class="filter-option">
+        <input type="checkbox" class="filter-cat" value="{{ category.slug }}"> {{ category.name }}
+      </label>
+      {% endfor %}
+    </div>
+    <h3 class="filter-group-title">موجودی</h3>
+    <label class="filter-option">
+      <input type="checkbox" class="filter-stock" checked> فقط کالاهای موجود
+    </label>
+  </aside>
+
+  <div>
+    <div class="catalog-toolbar reveal">
+      <span id="catalog-count" class="catalog-count">{{ products.count }} محصول</span>
+      <select id="sort-select" class="sort-select" aria-label="مرتب‌سازی">
+        <option value="popular">محبوب‌ترین</option>
+        <option value="price-asc">ارزان‌ترین</option>
+        <option value="price-desc">گران‌ترین</option>
+        <option value="rating">بیشترین امتیاز</option>
+      </select>
+    </div>
+    
+    <div id="product-grid" class="product-grid">
+      {% for product in products %}
+        {% include 'products/includes/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    window.APF_DATA.products = [
+        {% for product in products %}
+        { 
+            id: {{ product.id }}, 
+            slug: '{{ product.slug }}', 
+            name: '{{ product.name }}', 
+            price: {{ product.price }}, 
+            category: '{{ product.category.name }}',
+            categorySlug: '{{ product.category.slug }}',
+            rating: {{ product.rating }},
+            reviews: {{ product.review_count }}
+        },
+        {% endfor %}
+    ];
+</script>
+<script src="{% static 'js/pages/products.js' %}"></script>
+{% endblock %}

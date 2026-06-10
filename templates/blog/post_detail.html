@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} | {{ site_name }}{% endblock %}
+{% block data_page %}blog-post{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<div class="container-main py-10">
+    <nav class="breadcrumb mb-8" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="{% url 'blog:post_list' %}">مجله سلامت</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>{{ post.title }}</span>
+    </nav>
+
+    <article class="max-w-4xl mx-auto">
+        <header class="mb-8">
+            <span class="pill-tag">{{ post.category.name }}</span>
+            <h1 class="text-3xl md:text-4xl font-black mt-4 mb-6 leading-tight">{{ post.title }}</h1>
+            
+            <div class="flex items-center gap-4 text-sm" style="color:var(--color-text-muted)">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold">
+                        {{ post.author.full_name|slice:":1" }}
+                    </div>
+                    <span>{{ post.author.full_name }}</span>
+                </div>
+                <span>•</span>
+                <span>{{ post.created_at|date:"j F Y" }}</span>
+                <span>•</span>
+                <span>{{ post.read_time }} دقیقه مطالعه</span>
+            </div>
+        </header>
+
+        {% if post.image %}
+        <div class="rounded-3xl overflow-hidden mb-10 shadow-xl">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-auto">
+        </div>
+        {% endif %}
+
+        <div class="prose prose-lg max-w-none leading-loose" style="color:var(--color-text-secondary)">
+            {{ post.content|safe|linebreaks }}
+        </div>
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/blog-post.js' %}"></script>
+{% endblock %}

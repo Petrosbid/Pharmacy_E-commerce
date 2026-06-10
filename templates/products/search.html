@@ -1,0 +1,34 @@
+{% extends 'products/product_list.html' %}
+
+{% block title %}جستجوی «{{ query }}» | {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>جستجو</span>
+    </nav>
+    <h1 class="page-title">نتایج جستجو برای «{{ query }}»</h1>
+    <p class="page-subtitle">{{ products|length }} محصول یافت شد</p>
+  </div>
+</section>
+
+<div class="container-main pb-16 pt-8">
+  {% if products %}
+    <div id="product-grid" class="product-grid">
+      {% for product in products %}
+        {% include 'products/includes/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-20">
+      <div class="text-6xl mb-4">🔍</div>
+      <h2 class="text-2xl font-bold">محصولی یافت نشد</h2>
+      <p class="text-muted mt-2">لطفاً از کلمات کلیدی دیگری استفاده کنید.</p>
+      <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-6">مشاهده همه محصولات</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

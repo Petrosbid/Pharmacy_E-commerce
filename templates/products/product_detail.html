@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | {{ site_name }}{% endblock %}
+{% block data_page %}products{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<div class="container-main">
+  <nav class="breadcrumb pt-6" aria-label="مسیر">
+    <a href="{% url 'core:home' %}">خانه</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="{% url 'products:product_list' %}">محصولات</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+  </nav>
+
+  <div class="product-detail">
+    <div class="product-gallery reveal">
+      <div class="product-visual w-full h-full flex items-center justify-center">
+        {% if product.images.exists %}
+          <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="max-w-full max-h-full object-contain">
+        {% else %}
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1" opacity="0.2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+          </svg>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="product-detail-info reveal">
+      <span class="pill-tag">{{ product.category.name }}</span>
+      <h1 class="text-2xl font-bold mt-2">{{ product.name }}</h1>
+      
+      <div class="product-rating mt-2">
+        <div class="product-stars">
+          {% with ""|center:5 as range %}
+            {% for _ in range %}
+              {% if forloop.counter <= product.rating %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              {% else %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </div>
+        <span class="product-rating-count">({{ product.review_count }} نظر)</span>
+      </div>
+
+      <div class="product-detail-price mt-4">
+        {{ product.price|floatformat:0 }} تومان
+      </div>
+      {% if product.old_price %}
+        <span class="product-price-old">{{ product.old_price|floatformat:0 }} تومان</span>
+      {% endif %}
+
+      <p class="text-sm mt-4 leading-relaxed" style="color:var(--color-text-secondary)">
+        {{ product.description|linebreaksbr }}
+      </p>
+
+      <div class="flex items-center gap-4 mt-6">
+        <div class="qty-selector">
+          <button id="qty-minus" aria-label="کاهش">−</button>
+          <span id="qty-value">۱</span>
+          <button id="qty-plus" aria-label="افزایش">+</button>
+        </div>
+        <button id="add-to-cart" class="btn btn-primary flex-1" data-id="{{ product.id }}">افزودن به سبد خرید</button>
+        <button id="add-favorite" class="nav-action product-favorite" aria-label="علاقه‌مندی" data-fav-id="{{ product.id }}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+
+      <div class="trust-grid mt-8" style="grid-template-columns:repeat(2,1fr)">
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="trust-text"><strong>اصل و مجوزدار</strong><span>تضمین اصالت</span></div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div class="trust-text"><strong>ارسال سریع</strong><span>۲ تا ۴ ساعت</span></div>
+        </div>
+      </div>
+
+      <div class="info-tabs">
+        <button class="info-tab active" data-panel="panel-desc">توضیحات</button>
+        <button class="info-tab" data-panel="panel-usage">نحوه مصرف</button>
+        <button class="info-tab" data-panel="panel-warn">هشدارها</button>
+      </div>
+      <div id="panel-desc" class="info-panel active">
+        <p>این محصول با بالاترین استانداردهای کیفی و تحت نظارت داروسازان مجرب عرضه می‌شود. قبل از مصرف با پزشک یا داروساز مشورت کنید.</p>
+      </div>
+      <div id="panel-usage" class="info-panel">
+        <p>طبق دستور پزشک یا بروشور داخل بسته مصرف شود. از دوز توصیه‌شده تجاوز نکنید.</p>
+      </div>
+      <div id="panel-warn" class="info-panel">
+        <p>در دوران بارداری و شیردهی با پزشک مشورت کنید. در صورت بروز عوارض جانبی مصرف را متوقف و با داروساز تماس بگیرید.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="pb-16">
+    <h2 class="section-title text-xl mb-6 reveal">محصولات مرتبط</h2>
+    <div id="related-products" class="product-grid">
+      {% for related in related_products %}
+        {% include 'products/includes/product_card.html' with product=related %}
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    window.APF_DATA.products = [
+        { 
+            id: {{ product.id }}, 
+            slug: '{{ product.slug }}', 
+            name: '{{ product.name }}', 
+            price: {{ product.price }}, 
+            category: '{{ product.category.name }}',
+            rating: {{ product.rating }},
+            reviews: {{ product.review_count }}
+        },
+        {% for related in related_products %}
+        { 
+            id: {{ related.id }}, 
+            slug: '{{ related.slug }}', 
+            name: '{{ related.name }}', 
+            price: {{ related.price }}, 
+            category: '{{ related.category.name }}',
+            rating: {{ related.rating }},
+            reviews: {{ related.review_count }}
+        },
+        {% endfor %}
+    ];
+</script>
+<script src="{% static 'js/pages/product-detail.js' %}"></script>
+{% endblock %}

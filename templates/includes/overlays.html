@@ -1,0 +1,25 @@
+{% load static %}
+<div id="cart-drawer" class="cart-drawer" aria-hidden="true">
+  <div id="cart-backdrop" class="cart-drawer-backdrop"></div>
+  <div class="cart-drawer-panel" role="dialog" aria-label="سبد خرید">
+    <div class="cart-drawer-header">
+      <h2 class="font-bold text-lg">سبد خرید</h2>
+      <button id="cart-close" class="nav-action" aria-label="بستن">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="cart-drawer-body" class="cart-drawer-body">
+      <div class="cart-empty">
+        <p>سبد خرید شما خالی است</p>
+      </div>
+    </div>
+    <div class="cart-drawer-footer">
+      <div class="cart-total">
+        <span>جمع کل</span>
+        <span id="cart-total-price">۰ تومان</span>
+      </div>
+      <a href="{% url 'orders:checkout' %}" id="cart-checkout-btn" class="btn btn-primary w-full text-center">تکمیل خرید</a>
+    </div>
+  </div>
+</div>
+<div id="toast-container" class="toast-container" aria-live="polite"></div>

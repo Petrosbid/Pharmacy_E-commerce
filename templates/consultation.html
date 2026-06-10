@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}مشاوره داروساز | {{ site_name }}{% endblock %}
+{% block data_page %}consultation{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>مشاوره</span>
+    </nav>
+    <h1 class="page-title">مشاوره رایگان داروساز</h1>
+    <p class="page-subtitle">پاسخگویی ۲۴ ساعته به سوالات دارویی و بهداشتی شما توسط تیم متخصص</p>
+  </div>
+</section>
+
+<div class="container-main pb-16">
+  <div class="grid lg:grid-cols-2 gap-8">
+    <div class="form-card reveal">
+      <h2 class="font-bold text-lg mb-6">درخواست مشاوره</h2>
+      <form id="consultation-form" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">نام و نام خانوادگی</label>
+          <input type="text" name="full_name" class="form-input" required value="{{ user.full_name }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">شماره تماس</label>
+          <input type="tel" name="phone_number" class="form-input" required placeholder="۰۹۱۲۳۴۵۶۷۸۹" value="{{ user.phone_number }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">موضوع مشاوره</label>
+          <select name="subject" class="form-select">
+            <option>سوال در مورد تداخل دارویی</option>
+            <option>مشاوره خرید مکمل</option>
+            <option>روتین پوستی</option>
+            <option>سایر موارد</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">توضیحات</label>
+          <textarea name="message" class="form-textarea" required placeholder="سوال یا مشکل خود را مطرح کنید..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">ارسال درخواست</button>
+      </form>
+    </div>
+
+    <div class="reveal">
+        <div class="feature-card feature-card-highlight mb-6">
+            <h3 class="feature-title">پشتیبانی تلفنی مستقیم</h3>
+            <p class="feature-desc">اگر نیاز به پاسخ فوری دارید، همین حالا تماس بگیرید:</p>
+            <div class="text-2xl font-bold text-center py-4" style="color:var(--color-primary)">۰۲۱-۹۱۰۰۱۰۰۰</div>
+        </div>
+        <div class="feature-card">
+            <h3 class="feature-title">سوالات متداول مشاوره</h3>
+            <ul class="footer-links" style="padding:0">
+                <li><a href="{% url 'core:faq' %}">آیا مشاوره هزینه دارد؟</a></li>
+                <li><a href="{% url 'core:faq' %}">چقدر طول می‌کشد تا تماس بگیرید؟</a></li>
+                <li><a href="{% url 'core:faq' %}">آیا اطلاعات من محرمانه می‌ماند؟</a></li>
+            </ul>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/consultation.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ثبت نسخه | {{ site_name }}{% endblock %}
+{% block data_page %}prescription{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>ثبت نسخه</span>
+    </nav>
+    <h1 class="page-title">ثبت نسخه پزشکی</h1>
+    <p class="page-subtitle">نسخه خود را آپلود کنید — داروساز بررسی می‌کند و داروها را درب منزل تحویل می‌دهیم</p>
+  </div>
+</section>
+
+<div class="container-main pb-16">
+  <div class="grid lg:grid-cols-2 gap-8">
+    <div class="form-card reveal">
+      <h2 class="font-bold text-lg mb-4">آپلود نسخه</h2>
+      
+      <form id="prescription-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div id="upload-zone" class="upload-zone mb-6">
+          <input type="file" name="file" id="file-input" class="sr-only" accept="image/*,.pdf" required>
+          <div class="upload-zone-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+          <p class="font-semibold" id="file-name">فایل را اینجا رها کنید یا کلیک کنید</p>
+          <p class="text-sm mt-1" style="color:var(--color-text-muted)">JPG, PNG یا PDF — حداکثر ۱۰ مگابایت</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">نام و نام خانوادگی</label>
+          <input type="text" name="full_name" class="form-input" required placeholder="نام بیمار" value="{{ user.full_name }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">شماره تماس</label>
+          <input type="tel" name="phone_number" class="form-input" required placeholder="۰۹۱۲۳۴۵۶۷۸۹" value="{{ user.phone_number }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">آدرس تحویل</label>
+          <textarea name="address" class="form-textarea" required placeholder="آدرس کامل شامل پلاک و واحد"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">توضیحات (اختیاری)</label>
+          <textarea name="notes" class="form-textarea" placeholder="آلرژی دارویی، بیماری خاص و..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">ثبت و ارسال برای بررسی</button>
+      </form>
+    </div>
+
+    <div class="reveal">
+      <div class="feature-card mb-4"><div class="feature-icon">📋</div><h3 class="feature-title">مراحل ثبت نسخه</h3><p class="feature-desc mb-0">۱. آپلود عکس نسخه — ۲. بررسی داروساز (۱۵-۳۰ دقیقه) — ۳. تماس برای تایید — ۴. ارسال دارو</p></div>
+      <div class="feature-card mb-4"><div class="feature-icon">🔒</div><h3 class="feature-title">محرمانگی اطلاعات</h3><p class="feature-desc mb-0">اطلاعات پزشکی شما محرمانه نگهداری می‌شود و تنها برای تامین دارو استفاده می‌گردد.</p></div>
+      <div class="feature-card"><div class="feature-icon">📞</div><h3 class="feature-title">پشتیبانی نسخه</h3><p class="feature-desc mb-0">۰۲۱-۹۱۰۰۱۰۰۰ — پاسخگویی ۲۴ ساعته برای پیگیری نسخه</p></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/prescription.js' %}"></script>
+<script>
+  // Simple file name display
+  const fileInput = document.getElementById('file-input');
+  const fileNameDisplay = document.getElementById('file-name');
+  const uploadZone = document.getElementById('upload-zone');
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileNameDisplay.textContent = fileInput.files[0].name;
+      uploadZone.classList.add('has-file');
+    }
+  });
+</script>
+{% endblock %}

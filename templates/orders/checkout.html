@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تکمیل خرید | {{ site_name }}{% endblock %}
+{% block data_page %}checkout{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<div class="container-main pt-6">
+  <div class="checkout-steps">
+    <div class="checkout-step active"><span class="checkout-step-num">۱</span>سبد خرید</div>
+    <div class="checkout-step-line"></div>
+    <div class="checkout-step active"><span class="checkout-step-num">۲</span>اطلاعات ارسال</div>
+    <div class="checkout-step-line"></div>
+    <div class="checkout-step"><span class="checkout-step-num">۳</span>پرداخت</div>
+  </div>
+
+  <div class="checkout-layout">
+    <div class="form-card reveal">
+      <h2 class="font-bold text-lg mb-6">اطلاعات تحویل</h2>
+      <form id="checkout-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="cart_data" id="cart-data-input">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">نام گیرنده</label>
+            <input type="text" name="full_name" class="form-input" required value="{{ user.full_name }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">شماره تماس</label>
+            <input type="tel" name="phone_number" class="form-input" required value="{{ user.phone_number }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">آدرس</label>
+          <textarea name="address" class="form-textarea" required placeholder="آدرس دقیق تحویل..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">روش ارسال</label>
+          <select name="shipping_method" class="form-select">
+            <option value="standard">ارسال عادی (۲۴ ساعت) — رایگان</option>
+            <option value="express">ارسال اکسپرس (۲-۴ ساعت) — ۴۵,۰۰۰ تومان</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">روش پرداخت</label>
+          <select name="payment_method" class="form-select">
+            <option value="gateway">درگاه بانکی</option>
+            <option value="cod">پرداخت در محل</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">پرداخت و ثبت سفارش</button>
+      </form>
+    </div>
+
+    <aside class="checkout-summary reveal">
+      <h3 class="font-bold mb-4">خلاصه سفارش</h3>
+      <div id="checkout-items">
+        <!-- Rendered by JS from local storage cart -->
+      </div>
+      <div class="summary-row">
+        <span>جمع جزء</span>
+        <span id="checkout-subtotal">۰ تومان</span>
+      </div>
+      <div class="summary-row">
+        <span>هزینه ارسال</span>
+        <span id="shipping-cost">۰ تومان</span>
+      </div>
+      <div class="summary-row total">
+        <span>جمع کل</span>
+        <span id="checkout-total">۰ تومان</span>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/checkout.js' %}"></script>
+<script>
+  // Update shipping cost based on selection
+  const shippingSelect = document.querySelector('select[name="shipping_method"]');
+  const shippingCostEl = document.getElementById('shipping-cost');
+  const cartDataInput = document.getElementById('cart-data-input');
+  const checkoutForm = document.getElementById('checkout-form');
+  
+  function updateShippingUI() {
+    const val = shippingSelect.value;
+    const cost = val === 'express' ? 45000 : 0;
+    shippingCostEl.textContent = cost.toLocaleString('fa-IR') + ' تومان';
+    if (window.APF) {
+        const subtotal = APF.getCartTotal();
+        document.getElementById('checkout-total').textContent = (subtotal + cost).toLocaleString('fa-IR') + ' تومان';
+        // Also populate hidden input
+        cartDataInput.value = JSON.stringify(APF.state.cart);
+    }
+  }
+  
+  shippingSelect.addEventListener('change', updateShippingUI);
+  
+  // Intercept form submission to ensure cart data is there
+  checkoutForm.addEventListener('submit', (e) => {
+    if (window.APF) {
+        cartDataInput.value = JSON.stringify(APF.state.cart);
+        if (APF.state.cart.length === 0) {
+            e.preventDefault();
+            APF.showToast('سبد خرید شما خالی است.');
+        }
+    }
+  });
+
+  setTimeout(updateShippingUI, 100);
+</script>
+{% endblock %}

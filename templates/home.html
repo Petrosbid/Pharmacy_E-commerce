@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block data_page %}home{% endblock %}
+
+{% block content %}
+    <!-- ═══════════════════ HERO ═══════════════════ -->
+    <section id="hero-section" class="hero-section">
+      <div class="hero-mesh"></div>
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+      <div class="hero-shape hero-shape-1"></div>
+      <div class="hero-shape hero-shape-2"></div>
+
+      <div class="container-main">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center py-16 lg:py-24">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="hero-badge-dot"></span>
+              داروخانه آنلاین مورد اعتماد بیش از ۵۰ هزار خانواده
+            </div>
+
+            <h1 class="hero-title">
+              سلامتی شما، <span class="highlight">اولویت ماست</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              دارو، مکمل و محصولات بهداشتی اصل با ارسال سریع، مشاوره تخصصی داروساز و تضمین اصالت — تجربه‌ای متفاوت از خرید داروخانه‌ای.
+            </p>
+
+            <div class="hero-cta-group">
+              <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                مشاهده محصولات
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </a>
+              <a href="{% url 'prescriptions:submit' %}" class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>
+                ثبت نسخه پزشکی
+              </a>
+            </div>
+
+            <div class="trust-grid">
+              <div class="trust-item">
+                <div class="trust-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="trust-text">
+                  <strong>تضمین اصالت</strong>
+                  <span>محصولات دارای مجوز</span>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div class="trust-text">
+                  <strong>ارسال همان‌روز</strong>
+                  <span>در تهران و شهرهای بزرگ</span>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div class="trust-text">
+                  <strong>مشاوره داروساز</strong>
+                  <span>۲۴ ساعته، رایگان</span>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div class="trust-text">
+                  <strong>پرداخت امن</strong>
+                  <span>درگاه معتبر بانکی</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual hidden md:block">
+            <div class="hero-card-stack">
+              <div class="hero-floating-badge hero-floating-badge-1">✓ اصل و دارای مجوز</div>
+              <div class="hero-floating-badge hero-floating-badge-2">🚚 ارسال زیر ۳ ساعت</div>
+              <div class="hero-product-card">
+                <div class="hero-product-image">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1" opacity="0.4">
+                    <path d="M10.5 20.4L3.5 13.4C1.5 11.4 1.5 8.2 3.5 6.2s5.2-2 7.2 0l1.8 1.8 1.8-1.8c2-2 5.2-2 7.2 0s2 5.2 0 7.2l-7 7c-1 1-2.6 1-3.6 0z"/>
+                  </svg>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-xs font-semibold" style="color:var(--color-primary)">پرفروش‌ترین</div>
+                    <div class="font-bold mt-1">مولتی‌ویتامین کامل</div>
+                    <div class="text-sm mt-1" style="color:var(--color-text-muted)">۴۲۰,۰۰۰ تومان</div>
+                  </div>
+                  <div class="product-stars">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span class="text-sm font-bold mr-1">۴.۹</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ CATEGORIES ═══════════════════ -->
+    <section id="categories" class="section">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            دسته‌بندی محصولات
+          </div>
+          <h2 class="section-title">هر آنچه برای سلامتی نیاز دارید</h2>
+          <p class="section-desc">از داروهای عمومی تا محصولات مراقبت پوست — همه در یک جا، با کیفیت تضمین‌شده</p>
+        </div>
+
+        <div class="category-grid">
+          {% for category in categories %}
+          <a href="{{ category.get_absolute_url }}" class="category-card reveal">
+            <div class="category-icon">{{ category.icon|default:"💊" }}</div>
+            <div class="category-name">{{ category.name }}</div>
+            <div class="category-count">+{{ category.products.count }} محصول</div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider-gradient">
+
+    <!-- ═══════════════════ FEATURED PRODUCTS ═══════════════════ -->
+    <section id="products" class="section" style="background:var(--color-bg-muted)">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            محصولات ویژه
+          </div>
+          <h2 class="section-title">منتخب کارشناسان سلامت</h2>
+          <p class="section-desc">محصولات برتر با بالاترین رضایت مشتریان و تایید داروسازان</p>
+        </div>
+
+        <div class="product-tabs reveal">
+          <button class="tab-btn active" data-tab="all">همه</button>
+          <button class="tab-btn" data-tab="new">جدیدترین</button>
+          <button class="tab-btn" data-tab="popular">محبوب‌ترین</button>
+          <button class="tab-btn" data-tab="special">پیشنهاد ویژه</button>
+        </div>
+
+        <div id="product-grid" class="product-grid">
+          {% for product in featured_products %}
+            {% include 'products/includes/product_card.html' with product=product %}
+          {% endfor %}
+        </div>
+
+        <div class="text-center mt-10 reveal">
+          <a href="{% url 'products:product_list' %}" class="btn btn-secondary">مشاهده همه محصولات</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ PRESCRIPTION CTA ═══════════════════ -->
+    <section id="prescription" class="section">
+      <div class="container-main">
+        <div class="prescription-banner reveal">
+          <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 class="text-2xl md:text-3xl font-black mb-4">نسخه پزشکی دارید؟</h2>
+              <p class="text-white/85 mb-6 leading-relaxed">
+                عکس نسخه را آپلود کنید — داروساز ما بررسی می‌کند و داروها را درب منزل تحویل می‌دهیم. سریع، امن و بدون نیاز به مراجعه حضوری.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <a href="{% url 'prescriptions:submit' %}" class="btn btn-secondary">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                  آپلود نسخه
+                </a>
+                <a href="{% url 'core:faq' %}" class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)">
+                  راهنمای ثبت نسخه
+                </a>
+              </div>
+            </div>
+            <div class="hidden md:flex justify-center">
+              <div class="w-48 h-56 rounded-2xl border-2 border-dashed border-white/30 flex flex-col items-center justify-center gap-3 backdrop-blur-sm bg-white/10">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                <span class="text-sm text-white/70">فایل JPG یا PDF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ PHARMACY FEATURES ═══════════════════ -->
+    <section id="consultation" class="section">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">چرا آرمان فارما؟</div>
+          <h2 class="section-title">استاندارد جدید خرید داروخانه‌ای</h2>
+          <p class="section-desc">ترکیبی از تخصص پزشکی، تجربه خرید لوکس و خدمات در سطح بین‌المللی</p>
+        </div>
+
+        <div class="feature-grid feature-grid-3">
+          <div class="feature-card feature-card-highlight reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h3 class="feature-title">مشاوره رایگان داروساز</h3>
+            <p class="feature-desc">قبل از خرید، با داروسازان مجرب ما صحبت کنید. پاسخگویی ۲۴ ساعته از طریق تماس یا چت.</p>
+            <a href="{% url 'core:consultation' %}" class="btn btn-secondary text-sm">درخواست مشاوره</a>
+          </div>
+
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <h3 class="feature-title">تضمین اصالت محصول</h3>
+            <p class="feature-desc">تمام محصولات از مجوزداران رسمی تامین می‌شوند. هر بسته دارای کد رهگیری و مهر اصالت است.</p>
+            <a href="{% url 'core:home' %}" class="btn btn-ghost text-sm">بیشتر بدانید ←</a>
+          </div>
+
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <h3 class="feature-title">ارسال سریع و سردخانه‌ای</h3>
+            <p class="feature-desc">ارسال همان‌روز در تهران. داروهای حساس به دما با بسته‌بندی سردخانه‌ای ارسال می‌شوند.</p>
+            <a href="{% url 'core:faq' %}" class="btn btn-ghost text-sm">جزئیات ارسال ←</a>
+          </div>
+
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3 class="feature-title">پرداخت امن و مطمئن</h3>
+            <p class="feature-desc">درگاه پرداخت شاپرک با رمزنگاری SSL. امکان پرداخت در محل برای سفارش‌های بالای ۵۰۰ هزار تومان.</p>
+            <a href="{% url 'core:faq' %}" class="btn btn-ghost text-sm">روش‌های پرداخت ←</a>
+          </div>
+
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <h3 class="feature-title">مجله سلامت</h3>
+            <p class="feature-desc">مقالات تخصصی، نکات دارویی و راهنمای مصرف — نوشته‌شده توسط تیم داروسازان ما.</p>
+            <a href="{% url 'blog:post_list' %}" class="btn btn-ghost text-sm">مطالعه مقالات ←</a>
+          </div>
+
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <h3 class="feature-title">باشگاه مشتریان</h3>
+            <p class="feature-desc">با هر خرید امتیاز بگیرید و از تخفیف‌های اختصاصی، ارسال رایگان و هدایای ویژه بهره‌مند شوید.</p>
+            <a href="{% url 'users:login' %}" class="btn btn-ghost text-sm">عضویت رایگان ←</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ STATS ═══════════════════ -->
+    <section class="section" style="background:var(--color-bg-muted)">
+      <div class="container-main">
+        <div class="stats-grid reveal">
+          <div class="stat-item">
+            <div class="stat-number" data-counter="52000" data-suffix="+">۰</div>
+            <div class="stat-label">مشتری راضی</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-counter="8500" data-suffix="+">۰</div>
+            <div class="stat-label">محصول موجود</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-counter="98" data-suffix="٪">۰</div>
+            <div class="stat-label">رضایت مشتریان</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-counter="24" data-suffix="/۷">۰</div>
+            <div class="stat-label">پشتیبانی داروساز</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ REVIEWS ═══════════════════ -->
+    <section class="section">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">نظرات مشتریان</div>
+          <h2 class="section-title">اعتماد، حاصل تجربه واقعی</h2>
+          <p class="section-desc">بیش از ۱۲,۰۰۰ نظر ثبت‌شده با میانگین امتیاز ۴.۸ از ۵</p>
+        </div>
+
+        <div class="review-grid">
+          <div class="review-card reveal">
+            <div class="review-stars">
+              {% for i in "12345" %}<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>{% endfor %}
+            </div>
+            <p class="review-text">«نسخه پدرم را آپلود کردم و ظرف ۲ ساعت داروها رسید. بسته‌بندی عالی و داروساز هم قبل از ارسال تماس گرفت. واقعاً حرفه‌ای.»</p>
+            <div class="review-header mt-4">
+              <div class="review-avatar">م.ر</div>
+              <div class="review-meta">
+                <strong>مریم رضایی</strong>
+                <span>تهران — ۲ هفته پیش</span>
+                <div class="review-verified">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  خرید تاییدشده
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- More reviews can be dynamic later -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ BLOG ═══════════════════ -->
+    <section id="blog" class="section" style="background:var(--color-bg-muted)">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">مجله سلامت</div>
+          <h2 class="section-title">دانستنی‌های سلامت</h2>
+          <p class="section-desc">راهنماهای تخصصی نوشته‌شده توسط داروسازان آرمان فارما</p>
+        </div>
+
+        <div class="blog-grid">
+          {% for post in recent_posts %}
+          <a href="{{ post.get_absolute_url }}" class="blog-card reveal">
+            <div class="blog-card-image">{{ post.icon|default:"🌿" }}</div>
+            <div class="blog-card-body">
+              <div class="blog-tag">{{ post.category.name }}</div>
+              <h3 class="blog-title">{{ post.title }}</h3>
+              <p class="blog-excerpt">{{ post.excerpt }}</p>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ FAQ ═══════════════════ -->
+    <section id="faq" class="section">
+      <div class="container-main">
+        <div class="section-header reveal">
+          <div class="section-label">سوالات متداول</div>
+          <h2 class="section-title">پاسخ سوالات شما</h2>
+          <p class="section-desc">هر آنچه قبل از خرید از داروخانه آنلاین باید بدانید</p>
+        </div>
+
+        <div class="faq-list">
+          {% for faq in faqs %}
+          <div class="faq-item reveal">
+            <button class="faq-question" aria-expanded="false">
+              {{ faq.question }}
+              <span class="faq-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                {{ faq.answer }}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    window.APF_DATA.products = [
+        {% for product in featured_products %}
+        { 
+            id: {{ product.id }}, 
+            slug: '{{ product.slug }}', 
+            name: '{{ product.name }}', 
+            price: {{ product.price }}, 
+            oldPrice: {% if product.old_price %}{{ product.old_price }}{% else %}null{% endif %},
+            category: '{{ product.category.name }}',
+            rating: {{ product.rating|default:5 }},
+            reviews: {{ product.review_count|default:0 }},
+            badge: '{{ product.badge|default:"" }}',
+            tab: '{% if forloop.counter <= 4 %}new{% elif forloop.counter <= 6 %}popular{% else %}special{% endif %}'
+        },
+        {% endfor %}
+    ];
+</script>
+<script src="{% static 'js/pages/home.js' %}"></script>
+{% endblock %}

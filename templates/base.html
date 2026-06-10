@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}آرمان فارما — داروخانه آنلاین مدرن با ارسال سریع، مشاوره داروساز و تضمین اصالت محصول{% endblock %}">
+    <title>{% block title %}آرمان فارما | داروخانه آنلاین مدرن{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Vazirmatn', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body data-page="{% block data_page %}home{% endblock %}" class="{% block body_class %}{% endblock %}">
+
+    {% include 'includes/header.html' %}
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'includes/footer.html' %}
+    {% include 'includes/overlays.html' %}
+
+    <script>
+        window.APF_DATA = {
+            categories: [
+                {% for category in all_categories %}
+                { id: '{{ category.slug }}', name: '{{ category.name }}', icon: '{{ category.icon }}', slug: '{{ category.slug }}' },
+                {% endfor %}
+            ],
+            products: [], // Will be populated in specific templates if needed
+            badgeLabels: { new: 'جدید', sale: 'تخفیف ویژه', popular: 'محبوب', bestseller: 'پرفروش' },
+        };
+    </script>
+    <script src="{% static 'js/data.js' %}"></script>
+    <script src="{% static 'js/core.js' %}"></script>
+    {% comment %} 
+        We might need to disable or modify layout.js since we are now using Django templates for header/footer.
+        However, layout.js also handles mobile menu toggle and theme toggle.
+        I'll modify layout.js to only handle interactivity if needed, or just let it run if it doesn't conflict.
+        Actually, layout.js injects HTML. I should probably remove the injection part from layout.js or just not use it for injection.
+    {% endcomment %}
+    <script src="{% static 'js/layout.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

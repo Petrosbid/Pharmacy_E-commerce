@@ -1,0 +1,94 @@
+{% load static %}
+<a href="#main-content" class="skip-link">رفتن به محتوای اصلی</a>
+<header id="site-header" class="site-header {% if request.path != '/' %}scrolled{% endif %}">
+  <div class="container-main header-inner flex items-center justify-between gap-4">
+    <a href="{% url 'core:home' %}" class="brand-logo shrink-0">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2v20M2 12h20"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">{{ site_name }}</div>
+        <div class="brand-tagline hidden sm:block">{{ site_tagline }}</div>
+      </div>
+    </a>
+    
+    <div class="search-bar hidden lg:block">
+      <form action="{% url 'products:search' %}" method="get">
+        <input type="search" name="q" placeholder="جستجوی دارو، مکمل یا محصول بهداشتی..." aria-label="جستجو">
+        <button type="submit" class="search-icon-btn">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <nav class="hidden lg:flex items-center gap-1" aria-label="ناوبری اصلی">
+      <a href="{% url 'products:category_list' %}" class="px-3 py-2 text-sm font-semibold rounded-lg hover:text-[var(--color-primary)] transition-colors">دسته‌بندی‌ها</a>
+      <a href="{% url 'products:product_list' %}" class="px-3 py-2 text-sm font-semibold rounded-lg hover:text-[var(--color-primary)] transition-colors">محصولات</a>
+      <a href="{% url 'prescriptions:submit' %}" class="px-3 py-2 text-sm font-semibold rounded-lg hover:text-[var(--color-primary)] transition-colors">نسخه</a>
+      <a href="{% url 'core:consultation' %}" class="px-3 py-2 text-sm font-semibold rounded-lg hover:text-[var(--color-primary)] transition-colors">مشاوره</a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <button id="theme-toggle" class="theme-toggle" aria-label="تغییر تم">
+        <span class="theme-toggle-thumb">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </span>
+      </button>
+      
+      <a href="{% url 'products:favorites' %}" id="favorites-link" class="nav-action hidden sm:flex" aria-label="علاقه‌مندی‌ها">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
+      
+      {% if user.is_authenticated %}
+        <a href="{% url 'users:profile' %}" id="account-link" class="nav-action hidden sm:flex" aria-label="حساب کاربری">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% else %}
+        <a href="{% url 'users:login' %}" id="account-link" class="nav-action hidden sm:flex" aria-label="ورود">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% endif %}
+
+      <button id="cart-open" class="nav-action" aria-label="سبد خرید">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span id="cart-badge" class="badge" style="display:none">۰</span>
+      </button>
+      
+      <button id="mobile-menu-open" class="nav-action lg:hidden" aria-label="منوی موبایل" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+  <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
+  <div class="mobile-menu-panel">
+    <div class="flex items-center justify-between mb-6">
+      <span class="font-bold text-lg">منو</span>
+      <button id="mobile-menu-close" class="nav-action" aria-label="بستن">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="search-bar mb-6">
+      <form action="{% url 'products:search' %}" method="get">
+        <input type="search" name="q" placeholder="جستجو..." aria-label="جستجو">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </form>
+    </div>
+    <nav class="flex flex-col gap-1">
+      <a href="{% url 'products:category_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">دسته‌بندی‌ها</a>
+      <a href="{% url 'products:product_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">محصولات</a>
+      <a href="{% url 'prescriptions:submit' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">ثبت نسخه</a>
+      <a href="{% url 'core:consultation' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">مشاوره داروساز</a>
+      <a href="{% url 'blog:post_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">مجله سلامت</a>
+      <a href="{% url 'core:faq' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">سوالات متداول</a>
+      {% if not user.is_authenticated %}
+        <a href="{% url 'users:login' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">ورود / ثبت‌نام</a>
+      {% else %}
+        <a href="{% url 'users:profile' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">حساب کاربری</a>
+      {% endif %}
+    </nav>
+  </div>
+</div>
