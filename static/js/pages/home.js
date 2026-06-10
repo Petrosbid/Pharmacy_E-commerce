@@ -9,7 +9,7 @@
       const list = filter === 'all' ? APF.products : APF.products.filter(p => p.tab === filter);
       APF.renderProductGrid(grid, list.slice(0, 8));
     };
-    render('all');
+    // render('all') removed to preserve SSR
     document.querySelectorAll('.tab-btn').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));

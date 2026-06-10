@@ -60,13 +60,17 @@
         {% for product in products %}
         { 
             id: {{ product.id }}, 
-            slug: '{{ product.slug }}', 
-            name: '{{ product.name }}', 
+            slug: '{{ product.slug|escapejs }}', 
+            name: '{{ product.name|escapejs }}', 
             price: {{ product.price }}, 
-            category: '{{ product.category.name }}',
-            categorySlug: '{{ product.category.slug }}',
+            oldPrice: {% if product.old_price %}{{ product.old_price }}{% else %}null{% endif %},
+            category: '{{ product.category.name|escapejs }}',
+            categorySlug: '{{ product.category.slug|escapejs }}',
             rating: {{ product.rating }},
-            reviews: {{ product.review_count }}
+            reviews: {{ product.review_count }},
+            badge: '{{ product.badge|default:""|escapejs }}',
+            inStock: {% if product.in_stock %}true{% else %}false{% endif %},
+            image: '{% if product.images.exists %}{{ product.images.first.image.url|escapejs }}{% endif %}'
         },
         {% endfor %}
     ];

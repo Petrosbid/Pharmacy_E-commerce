@@ -8,9 +8,6 @@ window.APF = (function () {
   const STORAGE_FAVS = 'arman-pharma-favorites';
   const STORAGE_THEME = 'arman-pharma-theme';
 
-  const products = APF_DATA.products;
-  const badgeLabels = APF_DATA.badgeLabels;
-
   const state = {
     cart: JSON.parse(localStorage.getItem(STORAGE_CART) || '[]'),
     favorites: new Set(JSON.parse(localStorage.getItem(STORAGE_FAVS) || '[]')),
@@ -40,7 +37,7 @@ window.APF = (function () {
   }
 
   function getProduct(id) {
-    return products.find(p => p.id === id || p.slug === id);
+    return APF_DATA.products.find(p => p.id === id || p.slug === id);
   }
 
   function renderStars(rating) {
@@ -61,11 +58,20 @@ window.APF = (function () {
 
   function productCardHTML(product, opts = {}) {
     const link = opts.link !== false;
-    const badgeHtml = product.badge ? `<span class="product-badge product-badge-${product.badge}">${badgeLabels[product.badge]}</span>` : '';
+    const badgeLabels = APF_DATA.badgeLabels || {};
+    const badgeHtml = product.badge ? `<span class="product-badge product-badge-${product.badge}">${badgeLabels[product.badge] || product.badge}</span>` : '';
     const oldPriceHtml = product.oldPrice ? `<span class="product-price-old">${formatPrice(product.oldPrice)}</span>` : '';
     const isFav = state.favorites.has(product.id);
     const nameTag = link ? 'a' : 'h3';
     const nameAttrs = link ? `href="/products/${product.slug}/" class="product-name"` : 'class="product-name"';
+    
+    const imageHtml = product.image 
+      ? `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">`
+      : `<div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" opacity="0.3">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+          </svg>
+        </div>`;
 
     return `
       <article class="product-card reveal" data-product-id="${product.id}">
@@ -75,7 +81,7 @@ window.APF = (function () {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </button>
           ${link ? `<a href="/products/${product.slug}/" class="block w-full h-full flex items-center justify-center">` : ''}
-          <div class="product-visual"></div>
+          <div class="product-visual">${imageHtml}</div>
           ${link ? '</a>' : ''}
         </div>
         <div class="product-card-body">
@@ -170,9 +176,15 @@ window.APF = (function () {
   function initScrollReveal() {
     const reveals = $$('.reveal:not(.revealed)');
     if (!reveals.length) return;
+
+    // Fallback visibility
+    setTimeout(() => {
+      $$('.reveal:not(.revealed)').forEach(el => el.classList.add('revealed'));
+    }, 1500);
+
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); obs.unobserve(e.target); } });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
     reveals.forEach(el => obs.observe(el));
   }
 
@@ -198,7 +210,7 @@ window.APF = (function () {
 
   /* Cart */
   function addToCart(productId, qty = 1) {
-    const product = products.find(p => p.id === productId);
+    const product = APF_DATA.products.find(p => p.id === productId);
     if (!product) return;
     const existing = state.cart.find(i => i.id === productId);
     if (existing) existing.qty += qty;
@@ -340,7 +352,9 @@ window.APF = (function () {
   }
 
   return {
-    state, products, formatPrice, getProduct, renderStars, productCardHTML,
+    state, 
+    get products() { return APF_DATA.products; },
+    formatPrice, getProduct, renderStars, productCardHTML,
     renderProductGrid, bindProductEvents, addToCart, updateCartQty, toggleFavorite,
     initCore, initScrollReveal, initCounters, initFAQ, initHeroParallax, showToast,
     getCartTotal, getCartCount, updateCartUI,

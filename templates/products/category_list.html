@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}علاقه‌مندی‌ها | {{ site_name }}{% endblock %}
-{% block data_page %}favorites{% endblock %}
+{% block title %}دسته‌بندی‌ها | {{ site_name }}{% endblock %}
+{% block data_page %}categories{% endblock %}
 {% block body_class %}inner-page{% endblock %}
 
 {% block content %}
 
     <section class="page-hero">
       <div   class="container-main page-hero-content text-center">
-        <nav class="breadcrumb justify-center" aria-label="مسیر"><a href="index.html">خانه</a><span class="breadcrumb-sep">/</span><span>دسته‌بندی‌ها</span></nav>
+        <nav class="breadcrumb justify-center" aria-label="مسیر"><a href="{% url 'core:home' %}">خانه</a><span class="breadcrumb-sep">/</span><span>دسته‌بندی‌ها</span></nav>
         <h1  class="page-title">دسته‌بندی محصولات</h1>
         <p   class="page-subtitle mx-auto">هر آنچه برای سلامتی نیاز دارید — از دارو تا مکمل و مراقبت پوست</p>
       </div>
@@ -17,7 +17,7 @@
     <section class="section pt-0">
         <div class="category-grid">
           {% for category in categories %}
-            <a href="{{ category.get_absolute_url }}" class="category-card reveal mt-10">
+            <a href="{% url 'products:category_detail' category.slug %}" class="category-card reveal mt-10">
               <div class="category-icon">{{ category.icon|default:"💊" }}</div>
               <div class="category-name">{{ category.name }}</div>
               <div class="category-count">+{{ category.products.count }} محصول</div>

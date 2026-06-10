@@ -35,7 +35,7 @@
         window.APF_DATA = {
             categories: [
                 {% for category in all_categories %}
-                { id: '{{ category.slug }}', name: '{{ category.name }}', icon: '{{ category.icon }}', slug: '{{ category.slug }}' },
+                { id: '{{ category.slug|escapejs }}', name: '{{ category.name|escapejs }}', icon: '{{ category.icon|escapejs }}', slug: '{{ category.slug|escapejs }}' },
                 {% endfor %}
             ],
             products: [], // Will be populated in specific templates if needed
