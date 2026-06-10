@@ -112,11 +112,20 @@ window.APF = (function () {
   }
 
   function bindProductEvents(container) {
+    if (!container || container.dataset.eventsBound) return;
+    container.dataset.eventsBound = 'true';
+    
     container.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-add-id]');
-      if (addBtn) { addToCart(parseInt(addBtn.dataset.addId, 10)); rippleEffect(addBtn, e); return; }
+      if (addBtn) { 
+        addToCart(parseInt(addBtn.dataset.addId, 10)); 
+        rippleEffect(addBtn, e); 
+        return; 
+      }
       const favBtn = e.target.closest('[data-fav-id]');
-      if (favBtn) toggleFavorite(parseInt(favBtn.dataset.favId, 10), favBtn);
+      if (favBtn) {
+        toggleFavorite(parseInt(favBtn.dataset.favId, 10), favBtn);
+      }
     });
   }
 
@@ -211,7 +220,10 @@ window.APF = (function () {
   /* Cart */
   function addToCart(productId, qty = 1) {
     const product = APF_DATA.products.find(p => p.id === productId);
-    if (!product) return;
+    if (!product) {
+      console.error('Product not found in APF_DATA:', productId);
+      return;
+    }
     const existing = state.cart.find(i => i.id === productId);
     if (existing) existing.qty += qty;
     else state.cart.push({ id: product.id, name: product.name, price: product.price, qty });

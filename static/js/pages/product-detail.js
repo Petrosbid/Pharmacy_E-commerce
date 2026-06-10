@@ -13,8 +13,17 @@
         document.getElementById('qty-plus')?.addEventListener('click', () => { qty++; qtyEl.textContent = qty.toLocaleString('fa-IR'); });
     }
     
-    document.getElementById('add-to-cart')?.addEventListener('click', () => { for (let i = 0; i < qty; i++) APF.addToCart(product.id); });
-    document.getElementById('add-favorite')?.addEventListener('click', function () { APF.toggleFavorite(product.id, this); this.classList.toggle('active'); });
+    document.getElementById('add-to-cart')?.addEventListener('click', () => { 
+      for (let i = 0; i < qty; i++) APF.addToCart(product.id); 
+    });
+
+    const favBtn = document.getElementById('add-favorite');
+    if (favBtn) {
+      if (APF.state.favorites.has(product.id)) favBtn.classList.add('active');
+      favBtn.addEventListener('click', function () { 
+        APF.toggleFavorite(product.id, this); 
+      });
+    }
 
     document.querySelectorAll('.info-tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -25,8 +34,10 @@
       });
     });
 
-    const related = APF_DATA.products.slice(1, 5);
-    APF.renderProductGrid(document.getElementById('related-products'), related);
+    const relatedGrid = document.getElementById('related-products');
+    if (relatedGrid) {
+      APF.bindProductEvents(relatedGrid);
+    }
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();

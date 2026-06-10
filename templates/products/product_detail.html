@@ -114,22 +114,32 @@
     window.APF_DATA.products = [
         { 
             id: {{ product.id }}, 
-            slug: '{{ product.slug }}', 
-            name: '{{ product.name }}', 
+            slug: '{{ product.slug|escapejs }}', 
+            name: '{{ product.name|escapejs }}', 
             price: {{ product.price }}, 
-            category: '{{ product.category.name }}',
+            oldPrice: {% if product.old_price %}{{ product.old_price }}{% else %}null{% endif %},
+            category: '{{ product.category.name|escapejs }}',
+            categorySlug: '{{ product.category.slug|escapejs }}',
             rating: {{ product.rating }},
-            reviews: {{ product.review_count }}
+            reviews: {{ product.review_count }},
+            badge: '{{ product.badge|default:""|escapejs }}',
+            inStock: {% if product.in_stock %}true{% else %}false{% endif %},
+            image: '{% if product.images.exists %}{{ product.images.first.image.url|escapejs }}{% endif %}'
         },
         {% for related in related_products %}
         { 
             id: {{ related.id }}, 
-            slug: '{{ related.slug }}', 
-            name: '{{ related.name }}', 
+            slug: '{{ related.slug|escapejs }}', 
+            name: '{{ related.name|escapejs }}', 
             price: {{ related.price }}, 
-            category: '{{ related.category.name }}',
+            oldPrice: {% if related.old_price %}{{ related.old_price }}{% else %}null{% endif %},
+            category: '{{ related.category.name|escapejs }}',
+            categorySlug: '{{ related.category.slug|escapejs }}',
             rating: {{ related.rating }},
-            reviews: {{ related.review_count }}
+            reviews: {{ related.review_count }},
+            badge: '{{ related.badge|default:""|escapejs }}',
+            inStock: {% if related.in_stock %}true{% else %}false{% endif %},
+            image: '{% if related.images.exists %}{{ related.images.first.image.url|escapejs }}{% endif %}'
         },
         {% endfor %}
     ];

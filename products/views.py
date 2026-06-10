@@ -20,7 +20,12 @@ def category_list(request):
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
     products = category.products.all()
-    return render(request, 'products/category_detail.html', {'category': category, 'products': products})
+    context = {
+        'category': category,
+        'products': products,
+        'all_categories': Category.objects.all(),
+    }
+    return render(request, 'products/category_detail.html', context)
 
 def search(request):
     query = request.GET.get('q')

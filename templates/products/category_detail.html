@@ -40,13 +40,17 @@
         <option value="popular">محبوب‌ترین</option>
         <option value="price-asc">ارزان‌ترین</option>
         <option value="price-desc">گران‌ترین</option>
-        <option value="rating">بیشترین امتیاز</option>
+        <option value="rating">بیشترین</option>
       </select>
     </div>
-    
-    <div id="product-grid" class="product-grid">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full container mx-auto px-4">
       {% for product in products %}
-        {% include 'products/includes/product_card.html' with product=product %}
+        {% include 'products/includes/product_card.html' %}
+      {% empty %}
+        <div class="col-span-full text-center py-5">
+          <p class="text-muted text-gray-500">هیچ محصولی در این دسته‌بندی یافت نشد.</p>
+        </div>
       {% endfor %}
     </div>
   </div>

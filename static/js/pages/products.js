@@ -4,6 +4,7 @@
     const grid = document.getElementById('product-grid');
     const countEl = document.getElementById('catalog-count');
     if (!grid) return;
+    APF.bindProductEvents(grid);
 
     function applyFilters() {
       const products = APF.products || [];
