@@ -18,7 +18,10 @@
         <span>جمع کل</span>
         <span id="cart-total-price">۰ تومان</span>
       </div>
-      <a href="{% url 'orders:checkout' %}" id="cart-checkout-btn" class="btn btn-primary w-full text-center">تکمیل خرید</a>
+      <div class="flex flex-col gap-2">
+        <a href="{% url 'orders:checkout' %}" id="cart-checkout-btn" class="btn btn-primary w-full text-center">تکمیل خرید</a>
+        <a href="{% url 'cart:detail' %}" class="btn btn-ghost w-full text-center text-sm border border-[var(--color-border)]">مشاهده سبد خرید</a>
+      </div>
     </div>
   </div>
 </div>

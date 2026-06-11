@@ -217,32 +217,77 @@ window.APF = (function () {
     });
   }
 
-  /* Cart */
-  function addToCart(productId, qty = 1) {
-    const product = APF_DATA.products.find(p => p.id === productId);
-    if (!product) {
-      console.error('Product not found in APF_DATA:', productId);
-      return;
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
     }
-    const existing = state.cart.find(i => i.id === productId);
-    if (existing) existing.qty += qty;
-    else state.cart.push({ id: product.id, name: product.name, price: product.price, qty });
-    saveCart();
-    updateCartUI();
-    showToast(`${product.name} به سبد خرید اضافه شد`);
+    return cookieValue;
   }
 
-  function updateCartQty(productId, delta) {
-    const item = state.cart.find(i => i.id === productId);
-    if (!item) return;
-    item.qty += delta;
-    if (item.qty <= 0) state.cart = state.cart.filter(i => i.id !== productId);
-    saveCart();
-    updateCartUI();
+  async function apiPost(url, data) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify(data),
+    });
+    return response.json();
   }
 
-  function getCartTotal() { return state.cart.reduce((s, i) => s + i.price * i.qty, 0); }
-  function getCartCount() { return state.cart.reduce((s, i) => s + i.qty, 0); }
+  /* Cart */
+  async function addToCart(productId, qty = 1) {
+    try {
+      const result = await apiPost('/cart/add/', { product_id: productId, quantity: qty });
+      if (result.status === 'success') {
+        await syncCartState();
+        showToast(result.message);
+      } else {
+        showToast(result.message || 'خطا در افزودن به سبد خرید');
+      }
+    } catch (err) {
+      console.error('Cart add error:', err);
+      showToast('خطا در برقراری ارتباط با سرور');
+    }
+  }
+
+  async function updateCartQty(productId, delta) {
+    try {
+      const result = await apiPost('/cart/update/', { product_id: productId, delta: delta });
+      if (result.status === 'success') {
+        await syncCartState();
+      } else {
+        showToast(result.message || 'خطا در بروزرسانی سبد خرید');
+      }
+    } catch (err) {
+      console.error('Cart update error:', err);
+    }
+  }
+
+  async function syncCartState() {
+    try {
+      const response = await fetch('/cart/data/');
+      const data = await response.json();
+      state.cart = data.items;
+      updateCartUI();
+      // Also update the full cart page if we are on it
+      if (typeof renderFullCart === 'function') renderFullCart();
+    } catch (err) {
+      console.error('Cart sync error:', err);
+    }
+  }
+
+  function getCartTotal() { return state.cart.reduce((s, i) => s + i.price * i.quantity, 0); }
+  function getCartCount() { return state.cart.reduce((s, i) => s + i.quantity, 0); }
 
   function updateCartUI() {
     const badge = $('#cart-badge');
@@ -267,9 +312,11 @@ window.APF = (function () {
       body.innerHTML = `<div class="cart-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:1rem"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>سبد خرید شما خالی است</p></div>`;
     } else {
       body.innerHTML = state.cart.map(item => `
-        <div class="cart-item"><div class="cart-item-image"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+        <div class="cart-item"><div class="cart-item-image">
+          ${item.image ? `<img src="${item.image}" class="w-full h-full object-contain">` : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`}
+        </div>
         <div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${formatPrice(item.price)}</div>
-        <div class="cart-item-qty"><button aria-label="کاهش" data-qty-minus="${item.id}">−</button><span>${item.qty.toLocaleString('fa-IR')}</span><button aria-label="افزایش" data-qty-plus="${item.id}">+</button></div></div></div>`).join('');
+        <div class="cart-item-qty"><button aria-label="کاهش" data-qty-minus="${item.id}">−</button><span>${item.quantity.toLocaleString('fa-IR')}</span><button aria-label="افزایش" data-qty-plus="${item.id}">+</button></div></div></div>`).join('');
     }
     if (totalEl) totalEl.textContent = formatPrice(getCartTotal());
   }
@@ -358,7 +405,7 @@ window.APF = (function () {
     initCartDrawer();
     initSearch();
     initNewsletter();
-    updateCartUI();
+    syncCartState(); // Initial sync with backend
     $('#theme-toggle')?.addEventListener('click', toggleTheme);
     document.body.classList.add('page-enter');
   }
@@ -370,5 +417,6 @@ window.APF = (function () {
     renderProductGrid, bindProductEvents, addToCart, updateCartQty, toggleFavorite,
     initCore, initScrollReveal, initCounters, initFAQ, initHeroParallax, showToast,
     getCartTotal, getCartCount, updateCartUI,
+    apiPost, syncCartState // New exposed methods
   };
 })();

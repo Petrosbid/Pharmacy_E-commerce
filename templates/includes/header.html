@@ -80,6 +80,10 @@
     <nav class="flex flex-col gap-1">
       <a href="{% url 'products:category_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">دسته‌بندی‌ها</a>
       <a href="{% url 'products:product_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">محصولات</a>
+      <a href="{% url 'cart:detail' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)] flex items-center justify-between">
+        <span>سبد خرید</span>
+        <span class="cart-badge-mobile bg-[var(--color-primary)] text-white text-[10px] px-2 py-0.5 rounded-full">مشاهده</span>
+      </a>
       <a href="{% url 'prescriptions:submit' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">ثبت نسخه</a>
       <a href="{% url 'core:consultation' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">مشاوره داروساز</a>
       <a href="{% url 'blog:post_list' %}" class="mobile-nav-link px-4 py-3 rounded-lg font-semibold hover:bg-[var(--color-bg-muted)]">مجله سلامت</a>
