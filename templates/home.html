@@ -1,5 +1,5 @@
         {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block data_page %}home{% endblock %}
 
@@ -84,6 +84,27 @@
             <div class="hero-card-stack">
               <div class="hero-floating-badge hero-floating-badge-1">✓ اصل و دارای مجوز</div>
               <div class="hero-floating-badge hero-floating-badge-2">🚚 ارسال زیر ۳ ساعت</div>
+              
+              {% if site_settings.hero_product %}
+              <div class="hero-product-card" onclick="window.location.href='{{ site_settings.hero_product.get_absolute_url }}'" style="cursor:pointer">
+                <div class="hero-product-image">
+                  {% if site_settings.hero_product.images.exists %}
+                    <img src="{{ site_settings.hero_product.images.first.image.url }}" alt="{{ site_settings.hero_product.name }}" class="w-20 h-20 object-contain">
+                  {% else %}
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1" opacity="0.4">
+                      <path d="M10.5 20.4L3.5 13.4C1.5 11.4 1.5 8.2 3.5 6.2s5.2-2 7.2 0l1.8 1.8 1.8-1.8c2-2 5.2-2 7.2 0s2 5.2 0 7.2l-7 7c-1 1-2.6 1-3.6 0z"/>
+                    </svg>
+                  {% endif %}
+                </div>
+                <div class="flex items-center justify-between w-full">
+                  <div>
+                    <div class="text-xs font-semibold" style="color:var(--color-primary)">پیشنهاد ویژه</div>
+                    <div class="font-bold mt-1 text-sm truncate max-w-[120px]">{{ site_settings.hero_product.name }}</div>
+                    <div class="text-sm mt-1" style="color:var(--color-text-muted)">{{ site_settings.hero_product.price|intcomma }} تومان</div>
+                  </div>
+                </div>
+              </div>
+              {% else %}
               <div class="hero-product-card">
                 <div class="hero-product-image">
                   <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1" opacity="0.4">
@@ -102,6 +123,7 @@
                   </div>
                 </div>
               </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -378,15 +400,15 @@
     window.APF_DATA.products = [
         {% for product in featured_products %}
         { 
-            id: {{ product.id }}, 
+            id: Number('{{ product.id }}'.replace(/[,٬]/g, '')), 
             slug: '{{ product.slug|escapejs }}', 
             name: '{{ product.name|escapejs }}', 
-            price: {{ product.price }}, 
-            oldPrice: {% if product.old_price %}{{ product.old_price }}{% else %}null{% endif %},
+            price: Number('{{ product.price }}'.replace(/[,٬]/g, '')), 
+            oldPrice: {% if product.old_price %}Number('{{ product.old_price }}'.replace(/[,٬]/g, '')){% else %}null{% endif %},
             category: '{{ product.category.name|escapejs }}',
             categorySlug: '{{ product.category.slug|escapejs }}',
-            rating: {{ product.rating|default:5 }},
-            reviews: {{ product.review_count|default:0 }},
+            rating: Number('{{ product.rating|default:5 }}'.replace(/[,٬]/g, '')),
+            reviews: Number('{{ product.review_count|default:0 }}'.replace(/[,٬]/g, '')),
             badge: '{{ product.badge|default:""|escapejs }}',
             inStock: {% if product.in_stock %}true{% else %}false{% endif %},
             image: '{% if product.images.exists %}{{ product.images.first.image.url|escapejs }}{% endif %}',

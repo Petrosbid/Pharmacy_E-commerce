@@ -118,30 +118,30 @@
     // Populate the existing reference with push
     window.APF_DATA.products.push(
         {
-            id: {{ product.id }},
+            id: Number('{{ product.id }}'.replace(/[,٬]/g, '')),
             slug: '{{ product.slug|escapejs }}',
             name: '{{ product.name|escapejs }}',
-            price: {{ product.price }},
-            oldPrice: {% if product.old_price %}{{ product.old_price }}{% else %}null{% endif %},
+            price: Number('{{ product.price }}'.replace(/[,٬]/g, '')),
+            oldPrice: {% if product.old_price %}Number('{{ product.old_price }}'.replace(/[,٬]/g, '')){% else %}null{% endif %},
             category: '{{ product.category.name|escapejs }}',
             categorySlug: '{{ product.category.slug|escapejs }}',
-            rating: {{ product.rating }},
-            reviews: {{ product.review_count }},
+            rating: Number('{{ product.rating }}'.replace(/[,٬]/g, '')),
+            reviews: Number('{{ product.review_count }}'.replace(/[,٬]/g, '')),
             badge: '{{ product.badge|default:""|escapejs }}',
             inStock: {% if product.in_stock %}true{% else %}false{% endif %},
             image: '{% if product.images.exists %}{{ product.images.first.image.url|escapejs }}{% endif %}'
         },
         {% for related in related_products %}
         {
-            id: {{ related.id }},
+            id: Number('{{ related.id }}'.replace(/[,٬]/g, '')),
             slug: '{{ related.slug|escapejs }}',
             name: '{{ related.name|escapejs }}',
-            price: {{ related.price }},
-            oldPrice: {% if related.old_price %}{{ related.old_price }}{% else %}null{% endif %},
+            price: Number('{{ related.price }}'.replace(/[,٬]/g, '')),
+            oldPrice: {% if related.old_price %}Number('{{ related.old_price }}'.replace(/[,٬]/g, '')){% else %}null{% endif %},
             category: '{{ related.category.name|escapejs }}',
             categorySlug: '{{ related.category.slug|escapejs }}',
-            rating: {{ related.rating }},
-            reviews: {{ related.review_count }},
+            rating: Number('{{ related.rating }}'.replace(/[,٬]/g, '')),
+            reviews: Number('{{ related.review_count }}'.replace(/[,٬]/g, '')),
             badge: '{{ related.badge|default:""|escapejs }}',
             inStock: {% if related.in_stock %}true{% else %}false{% endif %},
             image: '{% if related.images.exists %}{{ related.images.first.image.url|escapejs }}{% endif %}'

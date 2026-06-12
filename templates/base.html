@@ -18,6 +18,11 @@
         };
     </script>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        :root {
+            --color-primary: {{ site_settings.theme_color }};
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body data-page="{% block data_page %}home{% endblock %}" class="{% block body_class %}{% endblock %}">
@@ -40,6 +45,7 @@
             ],
             products: [], // Will be populated in specific templates if needed
             badgeLabels: { new: 'جدید', sale: 'تخفیف ویژه', popular: 'محبوب', bestseller: 'پرفروش' },
+            expressShippingCost: Number('{{ site_settings.express_shipping_cost|default:45000 }}'.replace(/[,٬]/g, '')),
         };
     </script>
     <script src="{% static 'js/data.js' %}"></script>

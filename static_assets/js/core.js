@@ -198,41 +198,89 @@ window.APF = (function () {
   }
 
   /* Cart */
-  function addToCart(productId, qty = 1) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    const existing = state.cart.find(i => i.id === productId);
-    if (existing) existing.qty += qty;
-    else state.cart.push({ id: product.id, name: product.name, price: product.price, qty });
-    saveCart();
-    updateCartUI();
-    showToast(`${product.name} به سبد خرید اضافه شد`);
-  }
-
-  function updateCartQty(productId, delta) {
-    const item = state.cart.find(i => i.id === productId);
-    if (!item) return;
-    item.qty += delta;
-    if (item.qty <= 0) state.cart = state.cart.filter(i => i.id !== productId);
-    saveCart();
-    updateCartUI();
-  }
-
-  function getCartTotal() { return state.cart.reduce((s, i) => s + i.price * i.qty, 0); }
-  function getCartCount() { return state.cart.reduce((s, i) => s + i.qty, 0); }
-
-  function updateCartUI() {
-    const badge = $('#cart-badge');
-    const count = getCartCount();
-    if (badge) {
-      badge.textContent = count.toLocaleString('fa-IR');
-      badge.style.display = count > 0 ? 'flex' : 'none';
+  function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
     }
-    renderCartItems();
-    const checkoutTotal = $('#checkout-total');
-    if (checkoutTotal) checkoutTotal.textContent = formatPrice(getCartTotal());
-    const checkoutSubtotal = $('#checkout-subtotal');
-    if (checkoutSubtotal) checkoutSubtotal.textContent = formatPrice(getCartTotal());
+    return cookieValue;
+  }
+
+  async function apiCall(url, data = {}) {
+      try {
+          const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCSRFToken()
+              },
+              body: JSON.stringify(data)
+          });
+          return await response.json();
+      } catch (e) {
+          console.error("Cart API error:", e);
+          return {status: 'error'};
+      }
+  }
+
+  async function addToCart(productId, qty = 1) {
+    const result = await apiCall("/cart/add/", { product_id: productId, quantity: qty });
+    if (result.status === 'success') {
+      const product = products.find(p => p.id === productId);
+      if (product) showToast(`${product.name} به سبد خرید اضافه شد`);
+      else showToast('محصول به سبد خرید اضافه شد');
+      updateCartUI();
+      // If we are on the cart page, refresh the main view too
+      if (typeof refreshCartData === 'function') refreshCartData();
+    } else if (result.message) {
+      showToast(result.message, 'error');
+    }
+  }
+
+  async function updateCartQty(productId, delta) {
+    const result = await apiCall("/cart/update/", { product_id: productId, delta: delta });
+    if (result.status === 'success') {
+      updateCartUI();
+      // If we are on the cart page, refresh the main view too
+      if (typeof refreshCartData === 'function') refreshCartData();
+    } else if (result.message) {
+      showToast(result.message, 'error');
+    }
+  }
+
+  function getCartTotal() { return state.cartTotal || 0; }
+  function getCartCount() { return state.cartCount || 0; }
+
+  async function updateCartUI() {
+    try {
+        const response = await fetch("/cart/data/");
+        const data = await response.json();
+        
+        state.cartData = data.items;
+        state.cartTotal = data.total_price;
+        state.cartCount = data.total_items;
+
+        const badge = $('#cart-badge');
+        if (badge) {
+          badge.textContent = state.cartCount.toLocaleString('fa-IR');
+          badge.style.display = state.cartCount > 0 ? 'flex' : 'none';
+        }
+        renderCartItems();
+        
+        const checkoutTotal = $('#checkout-total');
+        if (checkoutTotal) checkoutTotal.textContent = formatPrice(state.cartTotal + (window.APF_DATA?.expressShippingCost || 45000));
+        const checkoutSubtotal = $('#checkout-subtotal');
+        if (checkoutSubtotal) checkoutSubtotal.textContent = formatPrice(state.cartTotal);
+    } catch (e) {
+        console.error("Failed to update cart UI", e);
+    }
   }
 
   function renderCartItems() {
@@ -240,15 +288,26 @@ window.APF = (function () {
     const totalEl = $('#cart-total-price');
     if (!body) return;
 
-    if (!state.cart.length) {
+    if (!state.cartData || state.cartData.length === 0) {
       body.innerHTML = `<div class="cart-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:1rem"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>سبد خرید شما خالی است</p></div>`;
     } else {
-      body.innerHTML = state.cart.map(item => `
-        <div class="cart-item"><div class="cart-item-image"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
-        <div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${formatPrice(item.price)}</div>
-        <div class="cart-item-qty"><button aria-label="کاهش" data-qty-minus="${item.id}">−</button><span>${item.qty.toLocaleString('fa-IR')}</span><button aria-label="افزایش" data-qty-plus="${item.id}">+</button></div></div></div>`).join('');
+      body.innerHTML = state.cartData.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-image">
+            ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`}
+          </div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${formatPrice(item.price)}</div>
+            <div class="cart-item-qty">
+              <button aria-label="کاهش" data-qty-minus="${item.id}">−</button>
+              <span>${item.quantity.toLocaleString('fa-IR')}</span>
+              <button aria-label="افزایش" data-qty-plus="${item.id}">+</button>
+            </div>
+          </div>
+        </div>`).join('');
     }
-    if (totalEl) totalEl.textContent = formatPrice(getCartTotal());
+    if (totalEl) totalEl.textContent = formatPrice(state.cartTotal || 0);
   }
 
   function initCartDrawer() {
@@ -263,7 +322,7 @@ window.APF = (function () {
       if (e.target.closest('[data-qty-minus]')) updateCartQty(parseInt(e.target.closest('[data-qty-minus]').dataset.qtyMinus, 10), -1);
       if (e.target.closest('[data-qty-plus]')) updateCartQty(parseInt(e.target.closest('[data-qty-plus]').dataset.qtyPlus, 10), 1);
     });
-    $('#cart-checkout-btn')?.addEventListener('click', () => { if (state.cart.length) window.location.href = '/orders/checkout/'; });
+    $('#cart-checkout-btn')?.addEventListener('click', () => { if (state.cartData && state.cartData.length) window.location.href = '/orders/checkout/'; });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) close(); });
   }
 
@@ -283,10 +342,13 @@ window.APF = (function () {
     });
   }
 
-  function showToast(message) {
+  function showToast(message, type = 'success') {
     const container = $('#toast-container');
     if (!container) return;
-    const toast = createElement('div', 'toast', `<span class="toast-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>${message}</span>`);
+    const icon = type === 'success' 
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    const toast = createElement('div', `toast toast-${type}`, `<span class="toast-icon">${icon}</span><span>${message}</span>`);
     container.appendChild(toast);
     setTimeout(() => { toast.classList.add('toast-out'); setTimeout(() => toast.remove(), 300); }, 3000);
   }

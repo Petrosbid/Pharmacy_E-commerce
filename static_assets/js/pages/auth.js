@@ -9,8 +9,6 @@
         document.getElementById(tab.dataset.panel)?.classList.remove('hidden');
       });
     });
-    document.getElementById('login-form')?.addEventListener('submit', e => { e.preventDefault(); window.location.href = '/users/profile/'; });
-    document.getElementById('register-form')?.addEventListener('submit', e => { e.preventDefault(); window.location.href = '/users/profile/'; });
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();

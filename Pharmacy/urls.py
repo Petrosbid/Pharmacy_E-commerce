@@ -8,7 +8,7 @@ admin.site.site_title = "مدیریت سایت"
 admin.site.index_title = "به داشبورد مدیریت خوش آمدید"
 
 urlpatterns = [
-    path('dashboard/', include('admin_material.urls')),
+
     path('admin/', admin.site.urls),
 
     path('', include('core.urls')),

@@ -41,13 +41,13 @@
     window.APF_DATA.products = [
         {% for product in all_products %}
         { 
-            id: {{ product.id }}, 
+            id: Number('{{ product.id }}'.replace(/[,٬]/g, '')), 
             slug: '{{ product.slug }}', 
             name: '{{ product.name }}', 
-            price: {{ product.price }}, 
+            price: Number('{{ product.price }}'.replace(/[,٬]/g, '')), 
             category: '{{ product.category.name }}',
-            rating: {{ product.rating }},
-            reviews: {{ product.review_count }}
+            rating: Number('{{ product.rating }}'.replace(/[,٬]/g, '')),
+            reviews: Number('{{ product.review_count }}'.replace(/[,٬]/g, ''))
         },
         {% endfor %}
     ];

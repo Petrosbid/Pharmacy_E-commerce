@@ -35,13 +35,21 @@ def cart_add(request):
     product = get_object_or_404(Product, id=product_id)
     
     # Check availability
-    if not product.in_stock:
+    if not product.in_stock or product.quantity <= 0:
         return JsonResponse({'status': 'error', 'message': 'متأسفانه این محصول در حال حاضر موجود نیست'}, status=400)
 
     cart = get_or_create_cart(request)
     
     with transaction.atomic():
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        requested_quantity = cart_item.quantity + quantity if not created else quantity
+        
+        if requested_quantity > product.quantity:
+            return JsonResponse({
+                'status': 'error', 
+                'message': f'تعداد درخواستی بیشتر از موجودی انبار است (موجودی: {product.quantity} عدد)'
+            }, status=400)
+            
         if not created:
             cart_item.quantity += quantity
         else:
@@ -66,9 +74,18 @@ def cart_update(request):
 
     cart = get_or_create_cart(request)
     cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
+    product = cart_item.product
     
     with transaction.atomic():
-        cart_item.quantity += delta
+        new_quantity = cart_item.quantity + delta
+        
+        if delta > 0 and new_quantity > product.quantity:
+            return JsonResponse({
+                'status': 'error', 
+                'message': f'تعداد درخواستی بیشتر از موجودی انبار است (موجودی: {product.quantity} عدد)'
+            }, status=400)
+            
+        cart_item.quantity = new_quantity
         if cart_item.quantity <= 0:
             cart_item.delete()
         else:

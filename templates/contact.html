@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تماس با ما | {{ site_name }}{% endblock %}
+{% block data_page %}contact{% endblock %}
+{% block body_class %}inner-page bg-[var(--color-bg)]{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>تماس با ما</span>
+    </nav>
+    <h1 class="page-title">ارتباط با {{ site_name }}</h1>
+    <p class="page-subtitle">ما همیشه آماده شنیدن نظرات، پیشنهادات و پاسخگویی به سوالات شما هستیم.</p>
+  </div>
+</section>
+
+<div class="container-main pb-24 -mt-8">
+  <div class="grid lg:grid-cols-3 gap-8">
+    
+    <!-- Contact Info Cards -->
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-8 reveal">
+        <div class="w-14 h-14 bg-[var(--color-primary-glow)] text-[var(--color-primary)] rounded-2xl flex items-center justify-center mb-6">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h3 class="text-lg font-black mb-2">شماره تماس</h3>
+        <p class="text-[var(--color-text-muted)] text-sm mb-4">پاسخگویی سریع در ساعات کاری</p>
+        <div class="text-xl font-bold font-mono" dir="ltr">{{ site_settings.phone }}</div>
+      </div>
+
+      <div class="bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-8 reveal">
+        <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h3 class="text-lg font-black mb-2">ایمیل پشتیبانی</h3>
+        <p class="text-[var(--color-text-muted)] text-sm mb-4">ارسال مدارک و پیگیری سازمانی</p>
+        <div class="text-lg font-bold font-mono" dir="ltr">{{ site_settings.email }}</div>
+      </div>
+
+      <div class="bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-8 reveal">
+        <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <h3 class="text-lg font-black mb-2">آدرس داروخانه</h3>
+        <p class="text-[var(--color-text-muted)] text-sm mb-4">مراجعه حضوری برای دریافت سفارش</p>
+        <div class="font-bold leading-relaxed">{{ site_settings.address }}</div>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="lg:col-span-2">
+      <div class="bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] p-8 md:p-12 reveal">
+        <div class="mb-10">
+          <h2 class="text-2xl font-black mb-2">ارسال پیام</h2>
+          <p class="text-[var(--color-text-muted)]">فرم زیر را پر کنید. کارشناسان ما در سریع‌ترین زمان ممکن با شما تماس خواهند گرفت.</p>
+        </div>
+
+        <form id="contact-form" class="space-y-6">
+          <div class="grid sm:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label class="block text-sm font-bold mb-2">نام و نام خانوادگی <span class="text-red-500">*</span></label>
+              <input type="text" class="w-full bg-[var(--color-bg-muted)] border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[var(--color-primary-glow)] outline-none" required placeholder="مثال: علی رضایی">
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-bold mb-2">شماره تماس <span class="text-red-500">*</span></label>
+              <input type="tel" class="w-full bg-[var(--color-bg-muted)] border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[var(--color-primary-glow)] outline-none" required placeholder="۰۹۱۲۳۴۵۶۷۸۹">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="block text-sm font-bold mb-2">موضوع پیام</label>
+            <select class="w-full bg-[var(--color-bg-muted)] border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[var(--color-primary-glow)] outline-none appearance-none">
+              <option value="support">پشتیبانی سفارش</option>
+              <option value="consultation">مشاوره دارویی</option>
+              <option value="complaint">انتقاد یا شکایت</option>
+              <option value="other">سایر موارد</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-bold mb-2">متن پیام <span class="text-red-500">*</span></label>
+            <textarea rows="5" class="w-full bg-[var(--color-bg-muted)] border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-[var(--color-primary-glow)] outline-none resize-none" required placeholder="متن پیام خود را اینجا بنویسید..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full py-4 text-lg shadow-glow">
+            ارسال پیام
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('contact-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (window.APF) {
+        APF.showToast('پیام شما با موفقیت ارسال شد. به زودی با شما تماس می‌گیریم.');
+        e.target.reset();
+    }
+  });
+</script>
+{% endblock %}

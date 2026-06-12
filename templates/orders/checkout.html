@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}تکمیل خرید | {{ site_name }}{% endblock %}
 {% block data_page %}checkout{% endblock %}
@@ -39,7 +39,7 @@
           <label class="form-label">روش ارسال</label>
           <select name="shipping_method" class="form-select">
             <option value="standard">ارسال عادی (۲۴ ساعت) — رایگان</option>
-            <option value="express">ارسال اکسپرس (۲-۴ ساعت) — ۴۵,۰۰۰ تومان</option>
+            <option value="express">ارسال اکسپرس (۲-۴ ساعت) — {{ site_settings.express_shipping_cost|intcomma }} تومان</option>
           </select>
         </div>
         <div class="form-group">
@@ -86,7 +86,7 @@
   
   function updateShippingUI() {
     const val = shippingSelect.value;
-    const cost = val === 'express' ? 45000 : 0;
+    const cost = val === 'express' ? (window.APF_DATA?.expressShippingCost || 45000) : 0;
     shippingCostEl.textContent = APF.formatPrice(cost);
     if (window.APF) {
         const subtotal = APF.getCartTotal();
@@ -101,8 +101,8 @@
   // Intercept form submission to ensure cart data is there
   checkoutForm.addEventListener('submit', (e) => {
     if (window.APF) {
-        cartDataInput.value = JSON.stringify(APF.state.cart);
-        if (APF.state.cart.length === 0) {
+        cartDataInput.value = JSON.stringify(APF.state.cartData);
+        if (!APF.state.cartData || APF.state.cartData.length === 0) {
             e.preventDefault();
             APF.showToast('سبد خرید شما خالی است.');
         }

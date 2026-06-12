@@ -1799,6 +1799,14 @@ body {
   justify-content: center;
   background: var(--color-success);
   color: white;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.toast-error .toast-icon {
+  background: var(--color-danger);
+}
+  color: white;
   border-radius: var(--radius-full);
   flex-shrink: 0;
 }

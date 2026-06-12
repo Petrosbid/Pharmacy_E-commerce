@@ -32,6 +32,7 @@ class Product(models.Model):
     description = models.TextField(_('description'), blank=True)
     price = models.PositiveIntegerField(_('price'))
     old_price = models.PositiveIntegerField(_('old price'), null=True, blank=True)
+    quantity = models.PositiveIntegerField(_('quantity'), default=0)
     in_stock = models.BooleanField(_('in stock'), default=True)
     badge = models.CharField(_('badge'), max_length=20, choices=BADGE_CHOICES, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
