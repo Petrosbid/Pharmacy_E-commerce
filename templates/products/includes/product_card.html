@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <article class="product-card reveal" data-product-id="{{ product.id }}">
   <div class="product-card-image">
     {% if product.badge %}
@@ -47,9 +47,9 @@
     
     <div class="product-footer">
       <div class="product-price-wrap">
-        <span class="product-price">{{ product.price|floatformat:0 }} تومان</span>
+        <span class="product-price">{{ product.price|intcomma }} تومان</span>
         {% if product.old_price %}
-          <span class="product-price-old">{{ product.old_price|floatformat:0 }} تومان</span>
+          <span class="product-price-old">{{ product.old_price|intcomma }} تومان</span>
         {% endif %}
       </div>
       <button class="product-add-btn" aria-label="افزودن به سبد خرید" data-add-id="{{ product.id }}">

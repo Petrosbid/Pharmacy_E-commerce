@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # Custom Apps
     'users',
@@ -123,10 +124,13 @@ LANGUAGE_CODE = 'fa-ir'
 
 TIME_ZONE = 'Asia/Tehran'
 
-LANGUAGE_CODE = 'fa-ir'
 USE_I18N = True
-
 USE_TZ = True
+
+# Custom formatting for prices
+THOUSAND_SEPARATOR = ','
+USE_THOUSAND_SEPARATOR = True
+NUMBER_GROUPING = 3
 
 
 # Static files (CSS, JavaScript, Images)

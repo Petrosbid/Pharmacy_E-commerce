@@ -26,7 +26,8 @@ window.APF = (function () {
   }
 
   function formatPrice(num) {
-    return num.toLocaleString('fa-IR') + ' تومان';
+    const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return num.toLocaleString('en-US').replace(/\d/g, x => farsiDigits[x]) + ' تومان';
   }
 
   function $(s, p = document) { return p.querySelector(s); }

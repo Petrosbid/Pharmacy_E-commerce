@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}سبد خرید | {{ site_name }}{% endblock %}
 {% block data_page %}cart{% endblock %}
@@ -19,26 +19,54 @@
 </section>
 
 <div class="container-main pb-24">
-  <div id="cart-content" class="grid lg:grid-cols-3 gap-8">
-    <!-- Items Column -->
+  <div id="cart-content" class="{% if not cart.items.exists %}hidden{% endif %} grid lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 space-y-4">
       <div id="cart-items-list" class="space-y-4">
-        <!-- Rendered by JS -->
-        <div class="bg-[var(--color-surface)] p-12 rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] text-center">
-            <div class="animate-pulse flex flex-col items-center">
-                <div class="w-16 h-16 bg-[var(--color-bg-muted)] rounded-full mb-4"></div>
-                <div class="h-4 bg-[var(--color-bg-muted)] w-48 rounded mb-2"></div>
-                <div class="h-3 bg-[var(--color-bg-muted)] w-32 rounded"></div>
-            </div>
-        </div>
-      </div>
+      {% for item in cart.items.all %}
+          <div class="cart-item-row flex items-center gap-4 p-4 bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] border border-[var(--color-border)]" data-product-id="{{ item.product.id }}">
+
+              {% if item.product.images.first %}
+                  <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg">
+              {% else %}
+                  <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-200 rounded-lg flex items-center justify-center text-xs">بدون عکس</div>
+              {% endif %}
+ 
+              <div class="flex-1">
+                  <h3 class="text-base md:text-lg font-bold">{{ item.product.name }}</h3>
+                  <p class="text-[var(--color-text-secondary)] text-xs mt-1">دسته‌بندی: {{ item.product.category.name|default:"-" }}</p>
+                  <p class="text-[var(--color-primary)] font-bold mt-2 text-sm md:text-base">واحد: {{ item.product.price|intcomma }} تومان</p>
+              </div>
+
+              <div class="flex flex-col md:flex-row items-center gap-4">
+                  <div class="flex items-center bg-[var(--color-bg-muted)] rounded-lg p-1">
+                      <button onclick="updateQuantity({{ item.product.id }}, -1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
+                      </button>
+                      <span class="w-10 text-center font-bold item-quantity">{{ item.quantity }}</span>
+                      <button onclick="updateQuantity({{ item.product.id }}, 1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                      </button>
+                  </div>
+                  
+                  <div class="text-center hidden md:block min-w-[100px]">
+                      <span class="block text-[10px] text-gray-500 mb-0.5">قیمت کل</span>
+                      <span class="block text-base font-bold text-[var(--color-primary)] item-total">{{ item.total_price|intcomma }} تومان</span>
+                  </div>
+
+                  <button onclick="removeItem({{ item.product.id }})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="حذف">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                  </button>
+              </div>
+          </div>
+      {% endfor %}
+    </div>
       
       <div class="flex items-center justify-between p-6 bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] border border-[var(--color-border)]">
         <a href="{% url 'products:product_list' %}" class="flex items-center gap-2 text-[var(--color-primary)] font-bold hover:gap-3 transition-all">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            ادامه خرید و مشاهده محصولات
+            ادامه خرید
         </a>
-        <button id="clear-cart" class="text-[var(--color-danger)] text-sm font-bold opacity-60 hover:opacity-100 transition-opacity">خالی کردن سبد خرید</button>
+        <button onclick="clearCart()" class="text-[var(--color-danger)] text-sm font-bold opacity-60 hover:opacity-100 transition-opacity">خالی کردن سبد</button>
       </div>
     </div>
 
@@ -53,20 +81,16 @@
         <div class="space-y-4 mb-8">
             <div class="flex justify-between items-center text-[var(--color-text-secondary)]">
                 <span>قیمت کالاها</span>
-                <span id="cart-subtotal" class="font-bold">۰ تومان</span>
+                <span id="cart-subtotal" class="font-bold">{{ cart.total_price|intcomma }} تومان</span>
             </div>
             <div class="flex justify-between items-center text-[var(--color-text-secondary)]">
                 <span>هزینه ارسال</span>
                 <span class="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg">رایگان</span>
             </div>
-            <div class="flex justify-between items-center text-[var(--color-text-secondary)]">
-                <span>تخفیف</span>
-                <span id="cart-discount" class="font-bold text-[var(--color-danger)]">۰ تومان</span>
-            </div>
             <hr class="border-[var(--color-border)]">
             <div class="flex justify-between items-center text-xl font-black">
                 <span>قابل پرداخت</span>
-                <span id="cart-total" class="text-[var(--color-primary)]">۰ تومان</span>
+                <span id="cart-total" class="text-[var(--color-primary)]">{{ cart.total_price|intcomma }} تومان</span>
             </div>
         </div>
 
@@ -88,8 +112,8 @@
     </div>
   </div>
 
-  <!-- Empty Cart State (Hidden by default) -->
-  <div id="cart-empty-state" class="hidden py-24 text-center">
+  <!-- Empty Cart State -->
+  <div id="cart-empty-state" class="{% if cart.items.exists %}hidden{% endif %} py-24 text-center">
     <div class="w-32 h-32 bg-[var(--color-bg-muted)] rounded-full flex items-center justify-center mx-auto mb-8">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     </div>
@@ -103,6 +127,99 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    async function apiCall(url, data = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    async function updateQuantity(productId, delta) {
+        const result = await apiCall("{% url 'cart:update' %}", { product_id: productId, delta: delta });
+        if (result.status === 'success') {
+            refreshCartData();
+        }
+    }
+
+    async function removeItem(productId) {
+        if (!confirm('آیا از حذف این مورد اطمینان دارید؟')) return;
+        const result = await apiCall("{% url 'cart:remove' %}", { product_id: productId });
+        if (result.status === 'success') {
+            refreshCartData();
+        }
+    }
+
+    async function clearCart() {
+        if (!confirm('آیا از خالی کردن سبد خرید اطمینان دارید؟')) return;
+        const result = await apiCall("{% url 'cart:clear' %}", {});
+        if (result.status === 'success') {
+            refreshCartData();
+        }
+    }
+
+    async function refreshCartData() {
+        const response = await fetch("{% url 'cart:data' %}");
+        const data = await response.json();
+        
+        if (data.items.length === 0) {
+            document.getElementById('cart-content').classList.add('hidden');
+            document.getElementById('cart-empty-state').classList.remove('hidden');
+        } else {
+            document.getElementById('cart-content').classList.remove('hidden');
+            document.getElementById('cart-empty-state').classList.add('hidden');
+            
+            // Update summary
+            document.getElementById('cart-subtotal').textContent = formatPrice(data.total_price);
+            document.getElementById('cart-total').textContent = formatPrice(data.total_price);
+            
+            // Update items list
+            const list = document.getElementById('cart-items-list');
+            list.innerHTML = data.items.map(item => `
+                <div class="cart-item-row flex items-center gap-4 p-4 bg-[var(--color-surface)] rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)] border border-[var(--color-border)]" data-product-id="${item.id}">
+                    <img src="${item.image || ''}" alt="${item.name}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h3 class="text-base md:text-lg font-bold">${item.name}</h3>
+                        <p class="text-[var(--color-text-secondary)] text-xs mt-1">دسته‌بندی: ${item.category || '-'}</p>
+                        <p class="text-[var(--color-primary)] font-bold mt-2 text-sm md:text-base">واحد: ${formatPrice(item.price)}</p>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <div class="flex items-center bg-[var(--color-bg-muted)] rounded-lg p-1">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
+                            </button>
+                            <span class="w-10 text-center font-bold item-quantity">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                            </button>
+                        </div>
+                        <div class="text-center hidden md:block min-w-[100px]">
+                            <span class="block text-[10px] text-gray-500 mb-0.5">قیمت کل</span>
+                            <span class="block text-base font-bold text-[var(--color-primary)] item-total">${formatPrice(item.total)}</span>
+                        </div>
+                        <button onclick="removeItem(${item.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="حذف">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        if (window.APF && typeof window.APF.updateCartUI === 'function') {
+            window.APF.updateCartUI();
+        }
+    }
+
+    function formatPrice(price) {
+        const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return price.toLocaleString('en-US').replace(/\d/g, x => farsiDigits[x]) + ' تومان';
+    }
+</script>
 <script src="{% static 'js/pages/cart-page.js' %}"></script>
 <script src="{% static 'js/pages/home.js' %}"></script>
 {% endblock %}

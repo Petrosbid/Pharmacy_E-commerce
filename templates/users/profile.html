@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}حساب کاربری | {{ site_name }}{% endblock %}
 {% block data_page %}profile{% endblock %}
@@ -124,7 +124,7 @@
               </div>
               <div class="flex items-center gap-6">
                 <div class="text-left">
-                  <div class="font-bold">{{ order.total_price|floatformat:0 }} تومان</div>
+                  <div class="font-bold">{{ order.total_price|intcomma }} تومان</div>
                   <div class="text-xs text-[var(--color-text-muted)]">{{ order.items.count }} محصول</div>
                 </div>
                 <span class="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">
@@ -165,7 +165,7 @@
               </div>
               <div class="text-left">
                 <span class="text-sm text-[var(--color-text-muted)] block mb-1">مبلغ کل</span>
-                <span class="text-xl font-black text-[var(--color-primary)]">{{ order.total_price|floatformat:0 }} تومان</span>
+                <span class="text-xl font-black text-[var(--color-primary)]">{{ order.total_price|intcomma }} تومان</span>
               </div>
             </div>
             

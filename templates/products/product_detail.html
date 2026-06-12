@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}{{ product.name }} | {{ site_name }}{% endblock %}
 {% block data_page %}products{% endblock %}
@@ -48,10 +48,10 @@
       </div>
 
       <div class="product-detail-price mt-4">
-        {{ product.price|floatformat:0 }} تومان
+        {{ product.price|intcomma }} تومان
       </div>
       {% if product.old_price %}
-        <span class="product-price-old">{{ product.old_price|floatformat:0 }} تومان</span>
+        <span class="product-price-old">{{ product.old_price|intcomma }} تومان</span>
       {% endif %}
 
       <p class="text-sm mt-4 leading-relaxed" style="color:var(--color-text-secondary)">
@@ -99,7 +99,8 @@
   </div>
 
   <section class="pb-16">
-    <h2 class="section-title text-xl mb-6 reveal">محصولات مرتبط</h2>
+    <h2 class="section-title text-xl mb-6 reveal">
+        محصولات مرتبط</h2>
     <div id="related-products" class="product-grid">
       {% for related in related_products %}
         {% include 'products/includes/product_card.html' with product=related %}

@@ -87,10 +87,10 @@
   function updateShippingUI() {
     const val = shippingSelect.value;
     const cost = val === 'express' ? 45000 : 0;
-    shippingCostEl.textContent = cost.toLocaleString('fa-IR') + ' تومان';
+    shippingCostEl.textContent = APF.formatPrice(cost);
     if (window.APF) {
         const subtotal = APF.getCartTotal();
-        document.getElementById('checkout-total').textContent = (subtotal + cost).toLocaleString('fa-IR') + ' تومان';
+        document.getElementById('checkout-total').textContent = APF.formatPrice(subtotal + cost);
         // Also populate hidden input
         cartDataInput.value = JSON.stringify(APF.state.cart);
     }
