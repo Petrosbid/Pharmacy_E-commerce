@@ -73,3 +73,20 @@ def payment_result(request):
         'order': order
     }
     return render(request, 'payment/payment_result.html', context)
+
+
+def simulate_payment(request):
+    authority = request.GET.get('authority')
+    amount = request.GET.get('amount')
+    callback = request.GET.get('callback')
+
+    if not all([authority, amount, callback]):
+        return redirect('core:home')
+
+    context = {
+        'authority': authority,
+        'amount': amount,
+        'callback': callback,
+        'site_name': 'آرمان فارما'
+    }
+    return render(request, 'payment/simulate_gateway.html', context)

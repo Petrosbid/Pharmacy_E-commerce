@@ -1,40 +1,119 @@
 {% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}نتیجه پرداخت | {{ site_settings.site_name }}{% endblock %}
+{% block data_page %}payment-result{% endblock %}
+{% block body_class %}inner-page{% endblock %}
 
 {% block content %}
-<div class="container my-5 text-center">
-    <div class="card p-5 shadow-sm">
-        {% if transaction.status == 'success' %}
-            <div class="text-success mb-4">
-                <i class="fas fa-check-circle fa-4x"></i>
-            </div>
-            <h2 class="text-success mb-3">پرداخت با موفقیت انجام شد!</h2>
-            <p class="lead">سفارش شماره <strong>{{ order.id }}</strong> با موفقیت ثبت و تایید شد.</p>
-            <p class="text-muted">بسته شما به زودی آماده‌سازی شده و از طریق 
-                <strong>
-                    {% if order.shipping_method == 'express' %}ارسال اکسپرس{% else %}ارسال معمولی{% endif %}
-                </strong> 
-                ارسال خواهد شد.
-            </p>
+<div class="container-main py-12 sm:py-20 flex justify-center">
+    <div class="max-w-2xl w-full page-enter">
+        <div class="relative overflow-hidden bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] p-8 sm:p-12 text-center">
             
-            <div class="alert alert-secondary d-inline-block my-3">
-                کد رهگیری بانکی: <strong>{{ transaction.callback_data.ref_id }}</strong>
+            {# Decorative background elements #}
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-[var(--color-primary-glow)] rounded-full blur-3xl opacity-50"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-[var(--color-accent-glow)] rounded-full blur-3xl opacity-30"></div>
+
+            <div class="relative z-10">
+                {% if transaction.status == 'success' %}
+                    <div class="mb-8 flex justify-center">
+                        <div class="w-24 h-24 bg-[var(--color-success)] bg-opacity-10 text-[var(--color-success)] rounded-full flex items-center justify-center shadow-inner animate-bounce-short">
+                            <i class="fas fa-check-circle fa-4x"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-3xl font-black mb-4 text-[var(--color-text)]">پرداخت با موفقیت انجام شد!</h2>
+                    <p class="text-[var(--color-text-secondary)] text-lg mb-8 leading-relaxed">
+                        سفارش شماره <strong class="text-[var(--color-primary)] font-bold">#{{ order.id }}</strong> با موفقیت در سیستم ثبت و تایید شد.
+                    </p>
+
+                    <div class="bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-6 mb-8 text-right">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-10 h-10 bg-[var(--color-surface)] rounded-lg flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-[var(--color-text-muted)] font-bold">روش ارسال</span>
+                                <span class="font-bold text-[var(--color-text)]">
+                                    {% if order.shipping_method == 'express' %}ارسال اکسپرس (تحویل سریع){% else %}ارسال معمولی (پست پیشتاز){% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-[var(--color-surface)] rounded-lg flex items-center justify-center text-[var(--color-primary)] shadow-sm">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-[var(--color-text-muted)] font-bold">کد رهگیری بانکی</span>
+                                <span class="font-mono text-[var(--color-text)] font-bold num-fa">{{ transaction.callback_data.ref_id|default:"ثبت نشده" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-[var(--color-text-muted)] text-sm mb-8">
+                        جزئیات سفارش و فاکتور به زودی از طریق پیامک برای شما ارسال خواهد شد.
+                    </p>
+                {% else %}
+                    <div class="mb-8 flex justify-center">
+                        <div class="w-24 h-24 bg-[var(--color-danger)] bg-opacity-10 text-[var(--color-danger)] rounded-full flex items-center justify-center shadow-inner">
+                            <i class="fas fa-times-circle fa-4x"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-3xl font-black mb-4 text-[var(--color-text)]">خطا در فرآیند پرداخت</h2>
+                    <p class="text-[var(--color-text-secondary)] text-lg mb-8 leading-relaxed">
+                        متاسفانه تراکنش شما با خطا مواجه شد و یا توسط شما لغو گردید.
+                    </p>
+
+                    <div class="bg-[var(--color-danger)] bg-opacity-5 border border-[var(--color-danger)] border-opacity-20 rounded-[var(--radius-xl)] p-6 mb-8">
+                        <p class="text-[var(--color-danger)] text-sm leading-relaxed">
+                            چنانچه مبلغی از حساب شما کسر شده است، حداکثر ظرف ۷۲ ساعت آینده توسط بانک به حساب شما بازگردانده خواهد شد.
+                        </p>
+                    </div>
+
+                    <div class="mb-8">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary w-full sm:w-auto px-12">
+                            <i class="fas fa-redo-alt ml-2"></i>
+                            تلاش مجدد برای پرداخت
+                        </a>
+                    </div>
+                {% endif %}
+
+                <div class="divider-gradient my-8"></div>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="{% url 'core:home' %}" class="btn btn-secondary w-full sm:w-auto">
+                        <i class="fas fa-home ml-2"></i>
+                        بازگشت به صفحه اصلی
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'orders:history' %}" class="btn btn-ghost w-full sm:w-auto">
+                            <i class="fas fa-list-ul ml-2"></i>
+                            مشاهده سفارشات من
+                        </a>
+                    {% endif %}
+                </div>
             </div>
-        {% else %}
-            <div class="text-danger mb-4">
-                <i class="fas fa-times-circle fa-4x"></i>
-            </div>
-            <h2 class="text-danger mb-3">خطا در پرداخت یا لغو تراکنش</h2>
-            <p class="lead">متاسفانه پرداخت سفارش شما موفقیت‌آمیز نبود.</p>
-            <p class="text-muted">چنانچه مبلغی از حساب شما کسر شده است، حداکثر ظرف ۷۲ ساعت آینده به حساب شما بازخواهد گشت.</p>
-            <a href="{% url 'orders:checkout' %}" class="btn btn-warning mt-3">تلاش مجدد برای پرداخت</a>
-        {% endif %}
-        
-        <div class="mt-4">
-            <a href="{% url 'core:home' %}" class="btn btn-outline-primary mx-2">بازگشت به صفحه اصلی</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'orders:history' %}" class="btn btn-primary mx-2">مشاهده تاریخچه سفارشات</a>
-            {% endif %}
         </div>
+
+        {% if transaction.status == 'success' %}
+        <div class="mt-8 text-center reveal">
+            <p class="text-[var(--color-text-muted)] text-sm">
+                نیاز به راهنمایی دارید؟ <a href="{% url 'core:contact' %}" class="text-[var(--color-primary)] font-bold">با ما در ارتباط باشید</a>
+            </p>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    @keyframes bounce-short {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    .animate-bounce-short {
+        animation: bounce-short 2s ease-in-out infinite;
+    }
+</style>
 {% endblock %}

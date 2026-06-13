@@ -51,3 +51,25 @@ class ZarinpalGateway(BaseGateway):
                 'code': result['data']['code']
             }
         return {'success': False, 'errors': result.get('errors')}
+
+class SimulatedGateway(BaseGateway):
+    def request_payment(self, amount, description, callback_url, mobile=None, email=None):
+        import uuid
+        authority = str(uuid.uuid4())
+        # We will use a local URL for the simulation
+        from django.urls import reverse
+        sim_url = f"{reverse('payment:simulate')}?authority={authority}&amount={amount}&callback={callback_url}"
+        return {
+            'success': True,
+            'url': sim_url,
+            'authority': authority
+        }
+
+    def verify_payment(self, authority, amount):
+        # In simulation, we always succeed if called (the simulation view handles the logic)
+        import random
+        return {
+            'success': True,
+            'ref_id': str(random.randint(10000000, 99999999)),
+            'code': 100
+        }

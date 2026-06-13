@@ -1,11 +1,18 @@
 from .models import Transaction
-from .gateways import ZarinpalGateway
+from .gateways import ZarinpalGateway, SimulatedGateway
 from django.conf import settings
 
 class PaymentService:
-    def __init__(self, gateway_name='zarinpal'):
+    def __init__(self, gateway_name=None):
+        if not gateway_name:
+            gateway_name = getattr(settings, 'DEFAULT_PAYMENT_GATEWAY', 'simulated')
+        
         if gateway_name == 'zarinpal':
             self.gateway = ZarinpalGateway(merchant_id=getattr(settings, 'ZARINPAL_MERCHANT_ID', 'YOUR-ID'))
+        else:
+            self.gateway = SimulatedGateway()
+            gateway_name = 'simulated'
+            
         self.gateway_name = gateway_name
 
     def create_transaction(self, order_id, amount):
