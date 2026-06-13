@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db import transaction
 from .models import Order, OrderItem
 from products.models import Product
 
@@ -36,16 +37,29 @@ def checkout(request):
         )
         
         total_price = 0
-        for item in cart_data:
-            product = Product.objects.get(id=item['id'])
-            qty = int(item['qty'])
-            OrderItem.objects.create(
-                order=order,
-                product=product,
-                quantity=qty,
-                price=product.price
-            )
-            total_price += product.price * qty
+        with transaction.atomic():
+            for item in cart_data:
+                product = Product.objects.select_for_update().get(id=item['id'])
+                quantity = int(item['quantity'])
+                
+                if product.quantity < quantity:
+                    messages.error(request, f'موجودی محصول {product.name} کافی نیست.')
+                    return redirect('cart:detail')
+
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=quantity,
+                    price=product.price
+                )
+                
+                # Reduce stock
+                product.quantity -= quantity
+                if product.quantity == 0:
+                    product.in_stock = False
+                product.save()
+                
+                total_price += product.price * quantity
         
         order.total_price = total_price + shipping_cost
         order.save()

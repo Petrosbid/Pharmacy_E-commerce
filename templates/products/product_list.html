@@ -57,7 +57,7 @@
 {% block extra_js %}
 <script>
     window.APF_DATA.products = [
-        {% for product in page_obj %}
+        {% for product in products %}
         { 
             id: Number('{{ product.id }}'.replace(/[,٬]/g, '')), 
             slug: '{{ product.slug|escapejs }}', 

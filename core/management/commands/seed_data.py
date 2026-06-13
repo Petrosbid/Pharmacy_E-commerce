@@ -55,6 +55,7 @@ class Command(BaseCommand):
                     'old_price': p_data.get('old_price'),
                     'badge': p_data['badge'],
                     'description': p_data['desc'],
+                    'quantity': 100,
                     'rating': 4.5,
                     'review_count': 10
                 }

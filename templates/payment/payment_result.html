@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="card p-5 shadow-sm">
+        {% if transaction.status == 'success' %}
+            <div class="text-success mb-4">
+                <i class="fas fa-check-circle fa-4x"></i>
+            </div>
+            <h2 class="text-success mb-3">پرداخت با موفقیت انجام شد!</h2>
+            <p class="lead">سفارش شماره <strong>{{ order.id }}</strong> با موفقیت ثبت و تایید شد.</p>
+            <p class="text-muted">بسته شما به زودی آماده‌سازی شده و از طریق 
+                <strong>
+                    {% if order.shipping_method == 'express' %}ارسال اکسپرس{% else %}ارسال معمولی{% endif %}
+                </strong> 
+                ارسال خواهد شد.
+            </p>
+            
+            <div class="alert alert-secondary d-inline-block my-3">
+                کد رهگیری بانکی: <strong>{{ transaction.callback_data.ref_id }}</strong>
+            </div>
+        {% else %}
+            <div class="text-danger mb-4">
+                <i class="fas fa-times-circle fa-4x"></i>
+            </div>
+            <h2 class="text-danger mb-3">خطا در پرداخت یا لغو تراکنش</h2>
+            <p class="lead">متاسفانه پرداخت سفارش شما موفقیت‌آمیز نبود.</p>
+            <p class="text-muted">چنانچه مبلغی از حساب شما کسر شده است، حداکثر ظرف ۷۲ ساعت آینده به حساب شما بازخواهد گشت.</p>
+            <a href="{% url 'orders:checkout' %}" class="btn btn-warning mt-3">تلاش مجدد برای پرداخت</a>
+        {% endif %}
+        
+        <div class="mt-4">
+            <a href="{% url 'core:home' %}" class="btn btn-outline-primary mx-2">بازگشت به صفحه اصلی</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'orders:history' %}" class="btn btn-primary mx-2">مشاهده تاریخچه سفارشات</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

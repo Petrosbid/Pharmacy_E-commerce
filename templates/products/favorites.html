@@ -45,6 +45,7 @@
             slug: '{{ product.slug }}', 
             name: '{{ product.name }}', 
             price: Number('{{ product.price }}'.replace(/[,٬]/g, '')), 
+            quantity: {{ product.quantity }},
             category: '{{ product.category.name }}',
             rating: Number('{{ product.rating }}'.replace(/[,٬]/g, '')),
             reviews: Number('{{ product.review_count }}'.replace(/[,٬]/g, ''))

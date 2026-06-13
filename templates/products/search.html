@@ -1,5 +1,5 @@
 {% extends 'products/product_list.html' %}
-
+{% load static %}
 {% block title %}جستجوی «{{ query }}» | {{ site_name }}{% endblock %}
 
 {% block content %}
@@ -32,3 +32,29 @@
   {% endif %}
 </div>
 {% endblock %}
+
+
+{% block extra_js %}
+<script>
+    window.APF_DATA.products = [
+        {% for product in products %}
+        {
+            id: Number('{{ product.id }}'.replace(/[,٬]/g, '')),
+            slug: '{{ product.slug|escapejs }}',
+            name: '{{ product.name|escapejs }}',
+            price: Number('{{ product.price }}'.replace(/[,٬]/g, '')),
+            oldPrice: {% if product.old_price %}Number('{{ product.old_price }}'.replace(/[,٬]/g, '')){% else %}null{% endif %},
+            category: '{{ product.category.name|escapejs }}',
+            categorySlug: '{{ product.category.slug|escapejs }}',
+            rating: Number('{{ product.rating|default:5 }}'.replace(/[,٬]/g, '')),
+            reviews: Number('{{ product.review_count|default:0 }}'.replace(/[,٬]/g, '')),
+            badge: '{{ product.badge|default:""|escapejs }}',
+            inStock: {% if product.in_stock %}true{% else %}false{% endif %},
+            image: '{% if product.images.exists %}{{ product.images.first.image.url|escapejs }}{% endif %}'
+        },
+        {% endfor %}
+    ];
+</script>
+<script src="{% static 'js/pages/products.js' %}"></script>
+{% endblock %}
+
