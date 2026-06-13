@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>درگاه پرداخت امن بانکی</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f0f2f5;
+            color: #1a202c;
+        }
+        .bank-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-focus:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bank-gradient text-white py-4 shadow-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-blue-900">
+                    <i class="fas fa-shield-alt fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">درگاه پرداخت الکترونیک</h1>
+                    <p class="text-xs opacity-75">پرداخت هوشمند و امن</p>
+                </div>
+            </div>
+            <div class="text-left">
+                <div id="timer" class="text-2xl font-mono font-bold">09:59</div>
+                <p class="text-[10px] opacity-75">زمان باقی‌مانده</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+        <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- Payment Form -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass-card rounded-2xl shadow-xl p-6 sm:p-8">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-credit-card text-blue-600"></i>
+                        اطلاعات کارت بانکی
+                    </h2>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-bold mb-2 text-gray-700">شماره کارت</label>
+                            <div class="relative">
+                                <input type="text" placeholder="---- ---- ---- ----" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center text-xl font-mono tracking-[0.2em] input-focus outline-none" maxlength="19" id="card-number">
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <i class="fas fa-university fa-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold mb-2 text-gray-700">CVV2</label>
+                            <input type="password" placeholder="***" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="4">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold mb-2 text-gray-700">تاریخ انقضا</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" placeholder="ماه" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="2">
+                                <input type="text" placeholder="سال" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="2">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-bold mb-2 text-gray-700">رمز دوم (اینترنتی)</label>
+                            <div class="flex gap-2">
+                                <input type="password" placeholder="******" class="flex-grow p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="8">
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl font-bold text-sm transition-colors whitespace-nowrap">دریافت رمز پویا</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                        <button id="btn-pay" class="flex-grow bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-black text-lg shadow-lg shadow-green-200 transition-all transform active:scale-95">
+                            پرداخت و تکمیل خرید
+                        </button>
+                        <button id="btn-cancel" class="sm:w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 rounded-xl font-bold transition-all">
+                            انصراف
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Security Tips -->
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6">
+                    <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        نکات امنیتی
+                    </h3>
+                    <ul class="text-sm text-blue-700 space-y-2 opacity-80">
+                        <li>• هرگز رمز عبور خود را در اختیار دیگران قرار ندهید.</li>
+                        <li>• برای ورود اطلاعات کارت خود حتما از صفحه کلید ایمن استفاده کنید.</li>
+                        <li>• پیش از وارد کردن اطلاعات، از صحت آدرس درگاه پرداخت اطمینان حاصل کنید.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gray-100 px-6 py-4 border-bottom">
+                        <h3 class="font-bold text-gray-700">اطلاعات تراکنش</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">پذیرنده</span>
+                            <span class="font-bold">{{ site_name }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">مبلغ قابل پرداخت</span>
+                            <span class="font-bold text-blue-600 text-lg">{{ amount }} تومان</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <span class="text-sm text-gray-500">کد رهگیری</span>
+                            <span class="font-mono text-xs">{{ authority|truncatechars:18 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center p-6 grayscale opacity-50">
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <img src="https://shaparak.ir/assets/img/shaparak-logo.png" alt="Shaparak" class="h-12">
+                    </div>
+                    <p class="text-[10px] mt-4 text-gray-500">تمامی حقوق این درگاه متعلق به شرکت شبکه الکترونیکی پرداخت کارت (شاپرک) می‌باشد.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-200 py-4 mt-auto">
+        <div class="container mx-auto px-4 text-center text-xs text-gray-500">
+            طراحی شده توسط دپارتمان فنی آرمان فارما — شبیه‌ساز پرداخت
+        </div>
+    </footer>
+
+    <script>
+        // Timer countdown
+        let time = 600;
+        const timerEl = document.getElementById('timer');
+        setInterval(() => {
+            if (time > 0) {
+                time--;
+                const mins = Math.floor(time / 60);
+                const secs = time % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            } else {
+                window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}";
+            }
+        }, 1000);
+
+        // Card number formatting
+        const cardInput = document.getElementById('card-number');
+        cardInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' - ';
+                formatted += value[i];
+            }
+            e.target.value = formatted;
+        });
+
+        // Redirect handlers
+        document.getElementById('btn-pay').addEventListener('click', () => {
+            const btn = document.getElementById('btn-pay');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال پردازش...';
+            
+            setTimeout(() => {
+                window.location.href = "{{ callback }}?Status=OK&Authority={{ authority }}";
+            }, 1500);
+        });
+
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}";
+        });
+    </script>
+</body>
+</html>
