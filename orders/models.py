@@ -49,6 +49,11 @@ class Order(models.Model):
     def __str__(self):
         return f'Order {self.id} - {self.full_name}'
 
+    @property
+    def items_price(self):
+        return max(0, self.total_price - self.shipping_cost)
+
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name=_('order'))
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, verbose_name=_('product'))

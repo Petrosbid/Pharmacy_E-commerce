@@ -57,6 +57,111 @@
         Actually, layout.js injects HTML. I should probably remove the injection part from layout.js or just not use it for injection.
     {% endcomment %}
     <script src="{% static 'js/layout.js' %}"></script>
+    {% if messages %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.APF && typeof window.APF.showToast === 'function') {
+          {% for message in messages %}
+            (function() {
+              const messageText = "{{ message.message|escapejs }}";
+              const messageTags = "{{ message.tags|escapejs }}";
+              const otpMatch = messageText.match(/(?:کد تستی جهت شبیه‌سازی|کد تستی):\s*(\d{4})/);
+              
+              if (otpMatch) {
+                const otpCode = otpMatch[1];
+                const smsContainer = document.createElement('div');
+                smsContainer.className = 'sms-notification-container';
+                smsContainer.innerHTML = `
+                  <div class="sms-card">
+                    <div class="sms-header">
+                      <div class="sms-app-info">
+                        <div class="sms-app-icon">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                          </svg>
+                        </div>
+                        <span class="sms-app-name">پیامک سیستم</span>
+                      </div>
+                      <span>هم‌اکنون</span>
+                    </div>
+                    <div class="sms-body">
+                      ${messageText.replace(otpCode, `<strong>${otpCode}</strong>`)}
+                    </div>
+                    <div class="sms-actions">
+                      <button type="button" class="sms-btn sms-btn-primary" id="sms-autofill-btn">اعمال خودکار</button>
+                      <button type="button" class="sms-btn sms-btn-secondary" id="sms-copy-btn">کپی کد</button>
+                    </div>
+                  </div>
+                `;
+                
+                document.body.appendChild(smsContainer);
+                setTimeout(() => { smsContainer.classList.add('show'); }, 600);
+                
+                // Copy button handler
+                const copyBtn = smsContainer.querySelector('#sms-copy-btn');
+                copyBtn.addEventListener('click', function() {
+                  navigator.clipboard.writeText(otpCode).then(() => {
+                    APF.showToast('کد تایید کپی شد');
+                    copyBtn.textContent = 'کپی شد!';
+                    setTimeout(() => { copyBtn.textContent = 'کپی کد'; }, 2000);
+                  }).catch(() => {
+                    const el = document.createElement('textarea');
+                    el.value = otpCode;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    APF.showToast('کد تایید کپی شد');
+                  });
+                });
+                
+                // Autofill button handler
+                const autofillBtn = smsContainer.querySelector('#sms-autofill-btn');
+                autofillBtn.addEventListener('click', function() {
+                  const otpInput = document.querySelector('input[name="otp_code"]');
+                  if (otpInput) {
+                    otpInput.value = otpCode;
+                    
+                    // Also fill visual inputs if they exist
+                    const visualInputs = document.querySelectorAll('.otp-digit-input');
+                    if (visualInputs.length === otpCode.length) {
+                      visualInputs.forEach((vInput, i) => {
+                        vInput.value = otpCode[i];
+                      });
+                    }
+                    
+                    APF.showToast('کد به صورت خودکار وارد شد');
+                    smsContainer.classList.remove('show');
+                    setTimeout(() => { smsContainer.remove(); }, 500);
+                    const form = otpInput.closest('form');
+                    if (form) {
+                      setTimeout(() => { form.submit(); }, 600);
+                    }
+                  } else {
+                    APF.showToast('فیلد ورود کد تایید در این صفحه یافت نشد', 'error');
+                  }
+                });
+                
+                // Auto-close simulated SMS after 20 seconds
+                setTimeout(() => {
+                  if (smsContainer && smsContainer.parentNode) {
+                    smsContainer.classList.remove('show');
+                    setTimeout(() => { if (smsContainer.parentNode) smsContainer.remove(); }, 500);
+                  }
+                }, 20000);
+                
+              } else {
+                const toastType = (messageTags.includes('error') || messageTags.includes('danger')) 
+                  ? 'error' 
+                  : (messageTags.includes('warning') ? 'warning' : 'success');
+                APF.showToast(messageText, toastType);
+              }
+            })();
+          {% endfor %}
+        }
+      });
+    </script>
+    {% endif %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تایید کد دو مرحله‌ای | {{ site_name }}{% endblock %}
+{% block data_page %}auth{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+  <div class="auth-card reveal">
+    <div class="text-center mb-6">
+      <a href="{% url 'core:home' %}" class="brand-logo justify-center">
+        <div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2v20M2 12h20"/></svg></div>
+        <div class="brand-name">{{ site_name }}</div>
+      </a>
+    </div>
+    
+    <div class="text-center mb-6">
+      <h2 class="font-bold text-lg text-[var(--color-text)]">کد تایید هویت</h2>
+      <p class="text-xs text-[var(--color-text-muted)] mt-1">کد تایید ۴ رقمی ارسال شده به شماره {{ phone_number }} را وارد کنید</p>
+    </div>
+
+    <form method="post" action="{% url 'users:verify_otp' %}" id="otp-verify-form">
+      {% csrf_token %}
+      <div class="form-group mb-6">
+        <label class="form-label text-center block mb-4">کد تایید پیامک شده</label>
+        
+        <!-- Multi-box OTP Input -->
+        <div class="flex justify-center gap-3 dir-ltr mb-4" id="otp-inputs-container">
+          <input type="text" inputmode="numeric" maxlength="1" pattern="\d*" required autofocus 
+                 class="otp-digit-input w-12 h-14 text-center bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-glow)] font-mono text-2xl font-bold text-[var(--color-text)] transition-all" autocomplete="one-time-code">
+          <input type="text" inputmode="numeric" maxlength="1" pattern="\d*" required 
+                 class="otp-digit-input w-12 h-14 text-center bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-glow)] font-mono text-2xl font-bold text-[var(--color-text)] transition-all" autocomplete="one-time-code">
+          <input type="text" inputmode="numeric" maxlength="1" pattern="\d*" required 
+                 class="otp-digit-input w-12 h-14 text-center bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-glow)] font-mono text-2xl font-bold text-[var(--color-text)] transition-all" autocomplete="one-time-code">
+          <input type="text" inputmode="numeric" maxlength="1" pattern="\d*" required 
+                 class="otp-digit-input w-12 h-14 text-center bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-xl focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary-glow)] font-mono text-2xl font-bold text-[var(--color-text)] transition-all" autocomplete="one-time-code">
+        </div>
+        
+        <!-- Hidden input for Django form submit -->
+        <input type="hidden" name="otp_code" id="otp_code_hidden">
+      </div>
+      
+      <button type="submit" class="btn btn-primary w-full mb-3 py-3 rounded-xl font-bold text-sm">تایید و ادامه</button>
+      
+      <div class="text-center flex flex-col gap-2">
+        <div class="text-xs text-[var(--color-text-muted)]">
+          کد را دریافت نکردید؟ <span id="otp-timer" class="font-bold text-[var(--color-primary)]">۶۰ ثانیه</span>
+          <button type="button" id="resend-otp-btn" class="hidden text-xs text-[var(--color-primary)] hover:underline font-bold bg-none border-none p-0 cursor-pointer">ارسال مجدد کد</button>
+        </div>
+        <a href="{% url 'users:login' %}" class="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:underline mt-2">بازگشت و تغییر شماره</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.APF && typeof window.APF.initCore === 'function') {
+      window.APF.initCore();
+    }
+    const inputs = document.querySelectorAll('.otp-digit-input');
+    const hiddenInput = document.getElementById('otp_code_hidden');
+    const form = document.getElementById('otp-verify-form');
+    
+    // Focus first input on load
+    if (inputs.length > 0) {
+      inputs[0].focus();
+    }
+    
+    // Function to update hidden input
+    function updateHiddenInput() {
+      let code = '';
+      inputs.forEach(input => {
+        code += input.value;
+      });
+      hiddenInput.value = code;
+    }
+    
+    inputs.forEach((input, index) => {
+      // Keydown handler (for backspace and arrows)
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace') {
+          if (input.value === '') {
+            // Focus previous input and clear it
+            if (index > 0) {
+              inputs[index - 1].focus();
+              inputs[index - 1].value = '';
+              updateHiddenInput();
+            }
+          } else {
+            // Clear current input
+            input.value = '';
+            updateHiddenInput();
+          }
+          e.preventDefault();
+        } else if (e.key === 'ArrowLeft') {
+          if (index > 0) inputs[index - 1].focus();
+        } else if (e.key === 'ArrowRight') {
+          if (index < inputs.length - 1) inputs[index + 1].focus();
+        }
+      });
+      
+      // Input handler (for digits)
+      input.addEventListener('input', function(e) {
+        const val = e.target.value;
+        // Only allow digit
+        if (!/^\d$/.test(val)) {
+          input.value = '';
+          return;
+        }
+        
+        updateHiddenInput();
+        
+        // Auto focus next input
+        if (val && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+        
+        // Auto submit if all filled
+        const allFilled = Array.from(inputs).every(i => i.value !== '');
+        if (allFilled) {
+          setTimeout(() => {
+            form.submit();
+          }, 200);
+        }
+      });
+      
+      // Paste handler
+      input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        const digits = text.replace(/\D/g, '').split('').slice(0, 4);
+        
+        digits.forEach((digit, i) => {
+          if (inputs[i]) {
+            inputs[i].value = digit;
+          }
+        });
+        
+        updateHiddenInput();
+        
+        const lastFocusedIndex = Math.min(digits.length, inputs.length - 1);
+        inputs[lastFocusedIndex].focus();
+        
+        const allFilled = Array.from(inputs).every(i => i.value !== '');
+        if (allFilled) {
+          setTimeout(() => {
+            form.submit();
+          }, 200);
+        }
+      });
+    });
+    
+    // Simulated Resend Timer
+    let timeLeft = 60;
+    const timerSpan = document.getElementById('otp-timer');
+    const resendBtn = document.getElementById('resend-otp-btn');
+    
+    const timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerSpan.classList.add('hidden');
+        resendBtn.classList.remove('hidden');
+      } else {
+        timerSpan.textContent = timeLeft + ' ثانیه';
+      }
+    }, 1000);
+    
+    resendBtn.addEventListener('click', function() {
+      window.location.reload();
+    });
+  });
+</script>
+{% endblock %}

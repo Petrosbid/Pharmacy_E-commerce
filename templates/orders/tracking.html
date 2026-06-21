@@ -198,7 +198,7 @@
             <div class="border-t border-[var(--color-border)] mt-6 pt-4 space-y-2 text-xs text-[var(--color-text-secondary)]">
               <div class="flex justify-between">
                 <span>هزینه اقلام سفارش</span>
-                <span class="num-fa">{% widthratio order.total_price|add:0 order.shipping_cost|add:0 1 as price %}{{ order.total_price|add:-order.shipping_cost|intcomma }} تومان</span>
+                <span class="num-fa">{{ order.items_price|intcomma }} تومان</span>
               </div>
               <div class="flex justify-between">
                 <span>هزینه حمل و نقل</span>

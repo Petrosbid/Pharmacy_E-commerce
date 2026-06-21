@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}پیگیری نسخه | {{ site_name }}{% endblock %}
+{% block data_page %}prescription-tracking{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container-main page-hero-content">
+    <nav class="breadcrumb" aria-label="مسیر">
+      <a href="{% url 'core:home' %}">خانه</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>پیگیری نسخه‌ها</span>
+    </nav>
+    <h1 class="page-title">پیگیری نسخه‌های ثبت شده</h1>
+    <p class="page-subtitle">وضعیت بررسی نسخه‌های پزشکی خود را در این صفحه مشاهده کنید</p>
+  </div>
+</section>
+
+<div class="container-main pb-16">
+  {% if not user.is_authenticated %}
+    <div class="form-card text-center py-12 reveal">
+      <div class="text-4xl mb-4">🔑</div>
+      <h2 class="font-bold text-xl mb-2 text-[var(--color-text)]">ورود به حساب کاربری</h2>
+      <p class="text-sm text-[var(--color-text-muted)] mb-6">برای مشاهده نسخه‌های ارسالی خود، لطفاً ابتدا وارد حساب کاربری شوید.</p>
+      <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary px-8">ورود به حساب</a>
+    </div>
+  {% else %}
+    <div class="reveal">
+      {% if not prescriptions %}
+        <div class="form-card text-center py-12">
+          <div class="text-4xl mb-4">📋</div>
+          <h2 class="font-bold text-lg mb-2 text-[var(--color-text)]">هیچ نسخه‌ای یافت نشد</h2>
+          <p class="text-xs text-[var(--color-text-muted)] mb-6">تاکنون نسخه‌ای در این حساب کاربری ثبت نکرده‌اید.</p>
+          <a href="{% url 'prescriptions:submit' %}" class="btn btn-primary px-8">ثبت نسخه جدید</a>
+        </div>
+      {% else %}
+        <div class="grid gap-6">
+          {% for prescription in prescriptions %}
+            <div class="form-card p-6 border border-[var(--color-border)] rounded-[var(--radius-2xl)] bg-[var(--color-surface)] shadow-sm">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 border-[var(--color-border)] mb-4 gap-4">
+                <div>
+                  <span class="text-xs text-[var(--color-text-muted)]">شناسه نسخه: #{{ prescription.id }}</span>
+                  <h3 class="font-bold text-base text-[var(--color-text)] mt-1">بیمار: {{ prescription.full_name }}</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-[var(--color-text-muted)]">وضعیت:</span>
+                  <span class="badge font-bold px-3 py-1.5 rounded-lg text-xs 
+                    {% if prescription.status == 'pending' %}bg-amber-100 text-amber-800
+                    {% elif prescription.status == 'reviewed' %}bg-blue-100 text-blue-800
+                    {% elif prescription.status == 'confirmed' %}bg-emerald-100 text-emerald-800
+                    {% elif prescription.status == 'delivered' %}bg-slate-100 text-slate-800
+                    {% elif prescription.status == 'cancelled' %}bg-red-100 text-red-800{% endif %}">
+                    {{ prescription.get_status_display }}
+                  </span>
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4 text-xs text-[var(--color-text-secondary)]">
+                <div>
+                  <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">تلفن تماس:</span>
+                  <span class="font-semibold text-[var(--color-text)] num-fa">{{ prescription.phone_number }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">تاریخ ثبت:</span>
+                  <span class="font-semibold text-[var(--color-text)] num-fa">{{ prescription.created_at|date:"Y/m/d H:i" }}</span>
+                </div>
+                <div class="md:col-span-2">
+                  <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">آدرس تحویل:</span>
+                  <span class="font-semibold text-[var(--color-text)] leading-relaxed">{{ prescription.address }}</span>
+                </div>
+                {% if prescription.notes %}
+                  <div class="md:col-span-2">
+                    <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">توضیحات:</span>
+                    <p class="font-semibold text-[var(--color-text)] leading-relaxed mb-0">{{ prescription.notes }}</p>
+                  </div>
+                {% endif %}
+                {% if prescription.file %}
+                  <div class="md:col-span-2 pt-2 border-t border-[var(--color-border)] mt-2">
+                    <a href="{{ prescription.file.url }}" target="_blank" class="btn btn-outline py-2 text-xs flex items-center justify-center gap-2 w-fit">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      <span>مشاهده فایل نسخه</span>
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
