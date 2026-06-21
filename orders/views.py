@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 from .models import Order, OrderItem
 from products.models import Product
 
@@ -79,10 +80,17 @@ def checkout(request):
     return render(request, 'orders/checkout.html')
 
 def tracking(request):
-    return render(request, 'orders/tracking.html')
+    order = None
+    order_id = request.GET.get('order_id')
+    if order_id:
+        try:
+            order = Order.objects.get(id=order_id)
+        except (Order.DoesNotExist, ValueError):
+            messages.error(request, 'سفارش مورد نظر یافت نشد. لطفا شماره سفارش را به درستی وارد کنید.')
+            
+    return render(request, 'orders/tracking.html', {'order': order, 'order_id': order_id})
 
+@login_required(login_url='users:login')
 def order_history(request):
-    orders = []
-    if request.user.is_authenticated:
-        orders = request.user.orders.all()
+    orders = request.user.orders.all()
     return render(request, 'orders/history.html', {'orders': orders})

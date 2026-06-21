@@ -38,6 +38,15 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    # Detailed pharmacy/medicinal fields
+    generic_name = models.CharField(_('generic name'), max_length=255, blank=True, null=True)
+    brand = models.CharField(_('brand'), max_length=255, blank=True, null=True)
+    dosage_form = models.CharField(_('dosage form'), max_length=100, blank=True, null=True)
+    dosage_strength = models.CharField(_('dosage strength'), max_length=100, blank=True, null=True)
+    usage_instructions = models.TextField(_('usage instructions'), blank=True, null=True)
+    warnings = models.TextField(_('warnings'), blank=True, null=True)
+    is_prescription_required = models.BooleanField(_('is prescription required'), default=False)
+    
     # Simple rating for now, can be improved with a Review model
     rating = models.DecimalField(_('rating'), max_digits=3, decimal_places=1, default=0.0)
     review_count = models.PositiveIntegerField(_('review count'), default=0)

@@ -1,177 +1,338 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>درگاه پرداخت امن بانکی</title>
+    <title>درگاه پرداخت امن بانکی — شبیه‌ساز آرمان فارما</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f0f2f5;
-            color: #1a202c;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
-        .bank-gradient {
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        .bank-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(243, 244, 246, 0.3);
         }
         .input-focus:focus {
-            border-color: #3182ce;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .credit-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            transition: all 0.5s ease;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col justify-between">
 
     <!-- Header -->
-    <header class="bank-gradient text-white py-4 shadow-lg">
-        <div class="container mx-auto px-4 flex justify-between items-center">
+    <header class="bank-header text-white py-4 shadow-xl">
+        <div class="container mx-auto px-4 max-w-6xl flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-blue-900">
-                    <i class="fas fa-shield-alt fa-lg"></i>
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white border border-white/20">
+                    <i class="fas fa-shield-halved fa-lg"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">درگاه پرداخت الکترونیک</h1>
-                    <p class="text-xs opacity-75">پرداخت هوشمند و امن</p>
+                    <h1 class="font-black text-base md:text-lg leading-tight tracking-wide">درگاه پرداخت الکترونیک شاپرک</h1>
+                    <p class="text-[10px] md:text-xs opacity-60">شبکه الکترونیکی پرداخت کارت (شبیه‌ساز رسمی)</p>
                 </div>
             </div>
             <div class="text-left">
-                <div id="timer" class="text-2xl font-mono font-bold">09:59</div>
-                <p class="text-[10px] opacity-75">زمان باقی‌مانده</p>
+                <div id="timer" class="text-xl md:text-2xl font-mono font-black text-amber-400">09:59</div>
+                <p class="text-[9px] md:text-[10px] opacity-60">زمان باقی‌مانده تراکنش</p>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+    <!-- Main Section -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid lg:grid-cols-3 gap-8">
             
-            <!-- Payment Form -->
+            <!-- Left Panel: Payment Form & Keyboard -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="glass-card rounded-2xl shadow-xl p-6 sm:p-8">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                        <i class="fas fa-credit-card text-blue-600"></i>
-                        اطلاعات کارت بانکی
-                    </h2>
+                
+                <!-- Live Credit Card Preview (Wow Factor!) -->
+                <div class="credit-card text-white rounded-3xl p-6 shadow-2xl relative overflow-hidden h-48 flex flex-col justify-between">
+                    <div class="absolute -right-16 -top-16 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl"></div>
+                    <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-widest text-slate-400 block mb-1">کارت بانکی تراکنش</span>
+                            <span id="cc-bank-name" class="font-black text-sm tracking-wide">بانک صادرکننده کارت</span>
+                        </div>
+                        <div id="cc-logo" class="text-2xl opacity-80">
+                            <i class="fas fa-university"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="relative z-10 my-4 text-center">
+                        <span id="cc-number" class="text-xl md:text-2xl font-mono tracking-[0.2em] font-bold text-slate-100">•••• •••• •••• ••••</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center relative z-10 text-xs">
+                        <div>
+                            <span class="text-[9px] text-slate-400 block uppercase">کد امنیتی CVV2</span>
+                            <span id="cc-cvv2" class="font-mono font-bold">•••</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] text-slate-400 block uppercase">تاریخ انقضا</span>
+                            <span id="cc-expiry" class="font-mono font-bold">••/••</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Payment Card -->
+                <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8 space-y-6">
+                    <div class="flex justify-between items-center border-b pb-4 border-slate-100">
+                        <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-credit-card text-blue-600"></i>
+                            ورود اطلاعات کارت بانکی
+                        </h2>
+                        <span class="text-xs text-slate-400 hidden sm:inline">ورود اطلاعات ایمن رمزگذاری شده</span>
+                    </div>
+
+                    <!-- Client validation error alerts -->
+                    <div id="error-alert" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm flex items-start gap-3">
+                        <i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0 text-red-600"></i>
+                        <span id="error-message" class="font-semibold leading-relaxed"></span>
+                    </div>
 
                     <div class="grid sm:grid-cols-2 gap-6">
+                        
+                        <!-- Card Number Input -->
                         <div class="sm:col-span-2">
-                            <label class="block text-sm font-bold mb-2 text-gray-700">شماره کارت</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-bold text-slate-700">شماره کارت ۱۶ رقمی</label>
+                                <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">شماره تستی: ۶۰۳۷۹۹۱۸۱۰۰۰۰۰۰۴</span>
+                            </div>
                             <div class="relative">
-                                <input type="text" placeholder="---- ---- ---- ----" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center text-xl font-mono tracking-[0.2em] input-focus outline-none" maxlength="19" id="card-number">
-                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <i class="fas fa-university fa-lg"></i>
+                                <input type="text" placeholder="---- ---- ---- ----" 
+                                       class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-xl font-mono tracking-[0.2em] input-focus outline-none font-bold text-slate-800" 
+                                       maxlength="25" id="card-number" autocomplete="off">
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" id="bank-input-logo">
+                                    <i class="fas fa-credit-card fa-lg"></i>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- CVV2 -->
                         <div>
-                            <label class="block text-sm font-bold mb-2 text-gray-700">CVV2</label>
-                            <input type="password" placeholder="***" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="4">
+                            <label class="block text-sm font-bold mb-2 text-slate-700">کد امنیتی CVV2</label>
+                            <input type="text" placeholder="کد ۳ یا ۴ رقمی پشت کارت" 
+                                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono input-focus outline-none text-slate-800 font-bold" 
+                                   maxlength="4" id="cvv2" autocomplete="off">
                         </div>
 
+                        <!-- Expiry Date -->
                         <div>
-                            <label class="block text-sm font-bold mb-2 text-gray-700">تاریخ انقضا</label>
+                            <label class="block text-sm font-bold mb-2 text-slate-700">تاریخ انقضای کارت</label>
                             <div class="grid grid-cols-2 gap-2">
-                                <input type="text" placeholder="ماه" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="2">
-                                <input type="text" placeholder="سال" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="2">
+                                <input type="text" placeholder="ماه (مثال: ۰۸)" 
+                                       class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono input-focus outline-none text-slate-800 font-bold" 
+                                       maxlength="2" id="expiry-month" autocomplete="off">
+                                <input type="text" placeholder="سال (مثال: ۰۷)" 
+                                       class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono input-focus outline-none text-slate-800 font-bold" 
+                                       maxlength="2" id="expiry-year" autocomplete="off">
                             </div>
                         </div>
 
+                        <!-- Second Password (PIN) -->
                         <div class="sm:col-span-2">
-                            <label class="block text-sm font-bold mb-2 text-gray-700">رمز دوم (اینترنتی)</label>
+                            <label class="block text-sm font-bold mb-2 text-slate-700">رمز دوم اینترنتی (پویا یا ثابت)</label>
                             <div class="flex gap-2">
-                                <input type="password" placeholder="******" class="flex-grow p-3 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono input-focus outline-none" maxlength="8">
-                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl font-bold text-sm transition-colors whitespace-nowrap">دریافت رمز پویا</button>
+                                <input type="password" placeholder="حداقل ۵ رقم" 
+                                       class="flex-grow p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono input-focus outline-none text-slate-800 font-bold" 
+                                       maxlength="8" id="pin" autocomplete="off">
+                                <button type="button" id="btn-otp" class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl font-bold text-xs transition-all active:scale-95 whitespace-nowrap">
+                                    دریافت رمز پویا
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                        <button id="btn-pay" class="flex-grow bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-black text-lg shadow-lg shadow-green-200 transition-all transform active:scale-95">
-                            پرداخت و تکمیل خرید
+                    <!-- Virtual Keypad (Shaparak Style!) -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                                <i class="fas fa-keyboard text-slate-400"></i>
+                                صفحه‌کلید امن (ترتیب تصادفی جهت امنیت بیشتر)
+                            </span>
+                            <button type="button" id="btn-clear-pin" class="text-xs text-red-500 font-bold hover:underline">پاک کردن رمز</button>
+                        </div>
+                        <div id="virtual-keypad" class="grid grid-cols-5 gap-2 max-w-sm mx-auto">
+                            <!-- Dynamic numeric buttons will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4 border-t border-slate-100 pt-6">
+                        <button id="btn-pay" class="flex-grow bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-emerald-100 transition-all transform active:scale-98 flex items-center justify-center gap-2">
+                            <span>پرداخت و تکمیل خرید</span>
                         </button>
-                        <button id="btn-cancel" class="sm:w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 rounded-xl font-bold transition-all">
-                            انصراف
+                        <button id="btn-cancel" class="sm:w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 py-4 rounded-2xl font-bold transition-all transform active:scale-98">
+                            انصراف از پرداخت
                         </button>
                     </div>
-                </div>
-
-                <!-- Security Tips -->
-                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-                    <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
-                        <i class="fas fa-info-circle"></i>
-                        نکات امنیتی
-                    </h3>
-                    <ul class="text-sm text-blue-700 space-y-2 opacity-80">
-                        <li>• هرگز رمز عبور خود را در اختیار دیگران قرار ندهید.</li>
-                        <li>• برای ورود اطلاعات کارت خود حتما از صفحه کلید ایمن استفاده کنید.</li>
-                        <li>• پیش از وارد کردن اطلاعات، از صحت آدرس درگاه پرداخت اطمینان حاصل کنید.</li>
-                    </ul>
                 </div>
             </div>
 
-            <!-- Sidebar -->
+            <!-- Right Panel: Transaction Details & Simulator Controls -->
             <div class="space-y-6">
-                <div class="glass-card rounded-2xl shadow-xl overflow-hidden">
-                    <div class="bg-gray-100 px-6 py-4 border-bottom">
-                        <h3 class="font-bold text-gray-700">اطلاعات تراکنش</h3>
+                
+                <!-- Transaction Info Card -->
+                <div class="glass-card rounded-3xl shadow-xl overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                        <h3 class="font-black text-slate-700 text-sm">جزئیات تراکنش مالی</h3>
                     </div>
                     <div class="p-6 space-y-4">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">پذیرنده</span>
-                            <span class="font-bold">{{ site_name }}</span>
+                            <span class="text-xs text-slate-500">فروشگاه پذیرنده</span>
+                            <span class="font-bold text-slate-800 text-sm">{{ site_name }}</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">مبلغ قابل پرداخت</span>
-                            <span class="font-bold text-blue-600 text-lg">{{ amount }} تومان</span>
+                            <span class="text-xs text-slate-500">شماره ترمینال</span>
+                            <span class="font-mono text-slate-700 text-xs">88239011</span>
                         </div>
-                        <div class="flex justify-between items-center border-t pt-4">
-                            <span class="text-sm text-gray-500">کد رهگیری</span>
-                            <span class="font-mono text-xs">{{ authority|truncatechars:18 }}</span>
+                        <div class="flex justify-between items-center border-t border-slate-100 pt-4">
+                            <span class="text-xs text-slate-500">مبلغ قابل پرداخت</span>
+                            <span class="font-black text-blue-600 text-lg">{{ amount|intcomma }} تومان</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-slate-100 pt-4">
+                            <span class="text-xs text-slate-500">شناسه مرجع تراکنش</span>
+                            <span class="font-mono text-xs text-slate-600">{{ authority|truncatechars:18 }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-center p-6 grayscale opacity-50">
-                    <div class="flex justify-center gap-4 flex-wrap">
-                        <img src="https://shaparak.ir/assets/img/shaparak-logo.png" alt="Shaparak" class="h-12">
+                <!-- Developer Control Panel (Simulator Scenario Settings) -->
+                <div class="glass-card rounded-3xl shadow-xl border-2 border-dashed border-blue-200 overflow-hidden">
+                    <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex items-center gap-2">
+                        <i class="fas fa-cogs text-blue-600"></i>
+                        <h3 class="font-black text-blue-900 text-sm">تنظیمات سناریو (مخصوص تست)</h3>
                     </div>
-                    <p class="text-[10px] mt-4 text-gray-500">تمامی حقوق این درگاه متعلق به شرکت شبکه الکترونیکی پرداخت کارت (شاپرک) می‌باشد.</p>
+                    <div class="p-6 space-y-4">
+                        <p class="text-[10px] text-blue-800/80 leading-relaxed font-semibold">
+                            برای آزمایش کارکرد درست خطاها در برنامه، یکی از سناریوهای زیر را انتخاب کنید تا پس از زدن دکمه پرداخت، خطای انتخاب شده شبیه‌سازی و به پنل بازگردانده شود.
+                        </p>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">سناریوی پرداخت:</label>
+                            <select id="sim-scenario" class="w-full p-3 bg-white border border-slate-200 rounded-xl outline-none font-bold text-xs">
+                                <option value="success" class="text-emerald-600 font-bold">تراکنش موفقیت‌آمیز (Success)</option>
+                                <option value="insufficient_funds" class="text-rose-600 font-bold">خطای موجودی ناکافی (Insufficient Funds)</option>
+                                <option value="incorrect_pin" class="text-rose-600 font-bold">خطای رمز دوم اشتباه (Incorrect PIN)</option>
+                                <option value="expired_card" class="text-rose-600 font-bold">خطای کارت منقضی شده (Expired Card)</option>
+                                <option value="invalid_cvv2" class="text-rose-600 font-bold">خطای کد CVV2 نامعتبر (Invalid CVV2)</option>
+                                <option value="system_timeout" class="text-rose-600 font-bold">خطای قطع ارتباط سرور بانک (System Timeout)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shaparak Info -->
+                <div class="text-center p-4 opacity-60">
+                    <div class="flex justify-center mb-3">
+                        <img src="https://shaparak.ir/assets/img/shaparak-logo.png" alt="Shaparak Logo" class="h-10 grayscale hover:grayscale-0 transition-all">
+                    </div>
+                    <p class="text-[9px] text-slate-500 leading-relaxed">
+                        این صفحه یک بستر پرداخت آزمایشی (Sandbox) می‌باشد و هیچ ارزش مالی واقعی ندارد. از وارد کردن اطلاعات واقعی کارت بانکی خودداری فرمایید.
+                    </p>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <footer class="bg-gray-200 py-4 mt-auto">
-        <div class="container mx-auto px-4 text-center text-xs text-gray-500">
-            طراحی شده توسط دپارتمان فنی آرمان فارما — شبیه‌ساز پرداخت
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 py-4 mt-auto border-t border-slate-700">
+        <div class="container mx-auto px-4 text-center text-xs">
+            طراحی شده توسط بخش فنی و امنیت اطلاعات {{ site_name }} — سامانه امن شبیه‌ساز پرداخت شاپرک V4.0
         </div>
     </footer>
 
     <script>
-        // Timer countdown
+        // Constants for Banks
+        const BANK_PREFIXES = {
+            '603799': { name: 'بانک ملی ایران', color: 'linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%)', icon: '<i class="fas fa-university text-yellow-300"></i>' },
+            '589210': { name: 'بانک سپه', color: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)', icon: '<i class="fas fa-shield text-emerald-400"></i>' },
+            '627353': { name: 'بانک تجارت', color: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', icon: '<i class="fas fa-university text-cyan-200"></i>' },
+            '621986': { name: 'بانک سامان', color: 'linear-gradient(135deg, #4f46e5 0%, #312e81 100%)', icon: '<i class="fas fa-star text-amber-300"></i>' },
+            '610433': { name: 'بانک ملت', color: 'linear-gradient(135deg, #be123c 0%, #9f1239 100%)', icon: '<i class="fas fa-award text-rose-300"></i>' },
+            '502229': { name: 'بانک پاسارگاد', color: 'linear-gradient(135deg, #a16207 0%, #713f12 100%)', icon: '<i class="fas fa-ring text-amber-300"></i>' },
+            '636214': { name: 'بانک آینده', color: 'linear-gradient(135deg, #b7791f 0%, #744210 100%)', icon: '<i class="fas fa-star text-yellow-300"></i>' }
+        };
+
+        // Transaction Timer
         let time = 600;
         const timerEl = document.getElementById('timer');
-        setInterval(() => {
+        const timerInterval = setInterval(() => {
             if (time > 0) {
                 time--;
                 const mins = Math.floor(time / 60);
                 const secs = time % 60;
                 timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             } else {
-                window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}";
+                clearInterval(timerInterval);
+                window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}&Error=timer_expire";
             }
         }, 1000);
 
-        // Card number formatting
+        // UI Element Selectors
         const cardInput = document.getElementById('card-number');
+        const cvv2Input = document.getElementById('cvv2');
+        const expiryMonthInput = document.getElementById('expiry-month');
+        const expiryYearInput = document.getElementById('expiry-year');
+        const pinInput = document.getElementById('pin');
+        
+        // CC Card Preview Selectors
+        const ccNumber = document.getElementById('cc-number');
+        const ccBankName = document.getElementById('cc-bank-name');
+        const ccLogo = document.getElementById('cc-logo');
+        const ccCvv2 = document.getElementById('cc-cvv2');
+        const ccExpiry = document.getElementById('cc-expiry');
+        const cardPreview = document.querySelector('.credit-card');
+
+        // Alert Selectors
+        const errorAlert = document.getElementById('error-alert');
+        const errorMessage = document.getElementById('error-message');
+
+        // Show error message helper
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorAlert.classList.remove('hidden');
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideError() {
+            errorAlert.classList.add('hidden');
+        }
+
+        // Luhn Algorithm Checker
+        function checkLuhn(cardNumber) {
+            let sum = 0;
+            let shouldDouble = false;
+            for (let i = cardNumber.length - 1; i >= 0; i--) {
+                let digit = parseInt(cardNumber.charAt(i), 10);
+                if (shouldDouble) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                sum += digit;
+                shouldDouble = !shouldDouble;
+            }
+            return (sum % 10) === 0;
+        }
+
+        // Card number formatting and live update
         cardInput.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
             let formatted = '';
@@ -180,21 +341,157 @@
                 formatted += value[i];
             }
             e.target.value = formatted;
+
+            // Update live card preview
+            ccNumber.textContent = formatted || '•••• •••• •••• ••••';
+
+            // Detect Bank Prefix (first 6 digits)
+            const prefix = value.substring(0, 6);
+            if (BANK_PREFIXES[prefix]) {
+                const bank = BANK_PREFIXES[prefix];
+                ccBankName.textContent = bank.name;
+                ccLogo.innerHTML = bank.icon;
+                cardPreview.style.background = bank.color;
+                document.getElementById('bank-input-logo').innerHTML = bank.icon;
+            } else {
+                ccBankName.textContent = 'بانک صادرکننده کارت';
+                ccLogo.innerHTML = '<i class="fas fa-university"></i>';
+                cardPreview.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
+                document.getElementById('bank-input-logo').innerHTML = '<i class="fas fa-credit-card fa-lg"></i>';
+            }
         });
 
-        // Redirect handlers
-        document.getElementById('btn-pay').addEventListener('click', () => {
-            const btn = document.getElementById('btn-pay');
+        // Other live update events
+        cvv2Input.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+            ccCvv2.textContent = e.target.value || '•••';
+        });
+
+        const updateExpiry = () => {
+            const m = expiryMonthInput.value.replace(/\D/g, '');
+            const y = expiryYearInput.value.replace(/\D/g, '');
+            expiryMonthInput.value = m;
+            expiryYearInput.value = y;
+            ccExpiry.textContent = `${m.padStart(2, '•')}/${y.padStart(2, '•')}`;
+        };
+        expiryMonthInput.addEventListener('input', updateExpiry);
+        expiryYearInput.addEventListener('input', updateExpiry);
+
+        // Virtual Keypad Generation
+        const keypadContainer = document.getElementById('virtual-keypad');
+        const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        
+        // Shuffle numbers array (Fisher-Yates Shuffle)
+        for (let i = numbers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+        }
+
+        // Render keypad buttons
+        numbers.forEach(num => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-center transition-all font-mono active:scale-95';
+            btn.textContent = num;
+            btn.addEventListener('click', () => {
+                if (pinInput.value.length < 8) {
+                    pinInput.value += num;
+                }
+            });
+            keypadContainer.appendChild(btn);
+        });
+
+        document.getElementById('btn-clear-pin').addEventListener('click', () => {
+            pinInput.value = '';
+        });
+
+        // Dynamic OTP code generator simulation
+        document.getElementById('btn-otp').addEventListener('click', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-otp');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال پردازش...';
+            btn.textContent = 'در حال ارسال...';
             
             setTimeout(() => {
-                window.location.href = "{{ callback }}?Status=OK&Authority={{ authority }}";
-            }, 1500);
+                const randomOTP = Math.floor(100000 + Math.random() * 900000);
+                pinInput.value = randomOTP;
+                btn.textContent = 'کد ارسال شد ✔';
+                btn.className = 'bg-emerald-600 text-white px-5 rounded-xl font-bold text-xs';
+                
+                // Show floating notice (alert simulation)
+                alert(`[شبیه‌ساز پیامک] رمز پویا تراکنش شما: ${randomOTP}`);
+            }, 1000);
+        });
+
+        // Redirect handlers & validations
+        document.getElementById('btn-pay').addEventListener('click', () => {
+            hideError();
+            
+            const rawCard = cardInput.value.replace(/\D/g, '');
+            const rawCvv2 = cvv2Input.value.replace(/\D/g, '');
+            const rawMonth = expiryMonthInput.value.replace(/\D/g, '');
+            const rawYear = expiryYearInput.value.replace(/\D/g, '');
+            const rawPin = pinInput.value.replace(/\D/g, '');
+
+            // 1. Validate Card Number
+            if (rawCard.length !== 16) {
+                showError('شماره کارت وارد شده معتبر نیست. لطفاً شماره کارت را دقیقاً ۱۶ رقم وارد کنید.');
+                cardInput.focus();
+                return;
+            }
+
+            // 2. Validate Card Number using Luhn algorithm
+            if (!checkLuhn(rawCard)) {
+                showError('شماره کارت نامعتبر است (کنترل ارقام Luhn با خطا مواجه شد). شماره کارت آزمایشی معتبر: ۶۰۳۷۹۹۱۸۱۰۰۰۰۰۰۴');
+                cardInput.focus();
+                return;
+            }
+
+            // 3. Validate CVV2
+            if (rawCvv2.length < 3 || rawCvv2.length > 4) {
+                showError('کد امنیتی CVV2 نامعتبر است. این کد معمولاً ۳ یا ۴ رقم می‌باشد.');
+                cvv2Input.focus();
+                return;
+            }
+
+            // 4. Validate Expiry Date
+            const month = parseInt(rawMonth, 10);
+            if (rawMonth.length !== 2 || isNaN(month) || month < 1 || month > 12) {
+                showError('ماه انقضا معتبر نیست. لطفاً عددی بین ۰۱ تا ۱۲ وارد کنید.');
+                expiryMonthInput.focus();
+                return;
+            }
+            if (rawYear.length !== 2) {
+                showError('سال انقضا معتبر نیست. لطفاً آن را به صورت ۲ رقمی وارد کنید.');
+                expiryYearInput.focus();
+                return;
+            }
+
+            // 5. Validate PIN
+            if (rawPin.length < 5) {
+                showError('رمز دوم وارد شده بسیار کوتاه است. رمز دوم باید حداقل ۵ رقم باشد.');
+                pinInput.focus();
+                return;
+            }
+
+            // Inputs verified! Process Payment scenario
+            const btn = document.getElementById('btn-pay');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال پردازش امن تراکنش...';
+            
+            const scenario = document.getElementById('sim-scenario').value;
+            
+            setTimeout(() => {
+                if (scenario === 'success') {
+                    window.location.href = "{{ callback }}?Status=OK&Authority={{ authority }}";
+                } else {
+                    window.location.href = `{{ callback }}?Status=NOK&Authority={{ authority }}&Error=${scenario}`;
+                }
+            }, 1800);
         });
 
         document.getElementById('btn-cancel').addEventListener('click', () => {
-            window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}";
+            window.location.href = "{{ callback }}?Status=NOK&Authority={{ authority }}&Error=user_cancel";
         });
     </script>
 </body>

@@ -29,7 +29,12 @@
     </div>
 
     <div class="product-detail-info reveal">
-      <span class="pill-tag">{{ product.category.name }}</span>
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="pill-tag">{{ product.category.name }}</span>
+        {% if product.is_prescription_required %}
+          <span class="pill-tag rx-badge">نیازمند نسخه پزشک 📋</span>
+        {% endif %}
+      </div>
       <h1 class="text-2xl font-bold mt-2">{{ product.name }}</h1>
       
       <div class="product-rating mt-2">
@@ -54,9 +59,50 @@
         <span class="product-price-old">{{ product.old_price|intcomma }} تومان</span>
       {% endif %}
 
-      <p class="text-sm mt-4 leading-relaxed" style="color:var(--color-text-secondary)">
-        {{ product.description|linebreaksbr }}
-      </p>
+      <!-- Specifications Table -->
+      {% if product.brand or product.generic_name or product.dosage_form or product.dosage_strength %}
+      <div class="product-specs-table">
+        {% if product.brand %}
+        <div class="product-spec-item">
+          <span class="product-spec-label">برند / سازنده</span>
+          <span class="product-spec-value">{{ product.brand }}</span>
+        </div>
+        {% endif %}
+        {% if product.generic_name %}
+        <div class="product-spec-item">
+          <span class="product-spec-label">نام ژنریک</span>
+          <span class="product-spec-value">{{ product.generic_name }}</span>
+        </div>
+        {% endif %}
+        {% if product.dosage_form %}
+        <div class="product-spec-item">
+          <span class="product-spec-label">شکل دارویی</span>
+          <span class="product-spec-value">{{ product.dosage_form }}</span>
+        </div>
+        {% endif %}
+        {% if product.dosage_strength %}
+        <div class="product-spec-item">
+          <span class="product-spec-label">دوز / قدرت دارویی</span>
+          <span class="product-spec-value">{{ product.dosage_strength }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if product.is_prescription_required %}
+      <div class="prescription-warning-alert">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div class="prescription-warning-text">
+          این کالا نیازمند نسخه معتبر پزشک است. شما می‌توانید نسخه خود را از منوی بالای سایت در بخش 
+          <a href="{% url 'prescriptions:submit' %}" style="text-decoration: underline; font-weight: 700;">ثبت نسخه</a> 
+          بارگذاری کنید تا پس از بررسی داروساز، هماهنگی‌های لازم انجام شود.
+        </div>
+      </div>
+      {% endif %}
 
       <div class="flex items-center gap-4 mt-6">
         <div class="qty-selector">
@@ -64,7 +110,9 @@
           <span id="qty-value">۱</span>
           <button id="qty-plus" aria-label="افزایش">+</button>
         </div>
-        <button id="add-to-cart" class="btn btn-primary flex-1" data-id="{{ product.id }}">افزودن به سبد خرید</button>
+        <button id="add-to-cart" class="btn btn-primary flex-1" data-id="{{ product.id }}">
+          {% if product.is_prescription_required %}افزودن نسخه به سبد خرید{% else %}افزودن به سبد خرید{% endif %}
+        </button>
         <button id="add-favorite" class="nav-action product-favorite" aria-label="علاقه‌مندی" data-fav-id="{{ product.id }}">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
@@ -83,18 +131,26 @@
 
       <div class="info-tabs">
         <button class="info-tab active" data-panel="panel-desc">توضیحات</button>
-        <button class="info-tab" data-panel="panel-usage">نحوه مصرف</button>
-        <button class="info-tab" data-panel="panel-warn">هشدارها</button>
+        {% if product.usage_instructions %}
+          <button class="info-tab" data-panel="panel-usage">نحوه مصرف</button>
+        {% endif %}
+        {% if product.warnings %}
+          <button class="info-tab" data-panel="panel-warn">هشدارها و عوارض</button>
+        {% endif %}
       </div>
       <div id="panel-desc" class="info-panel active">
-        <p>این محصول با بالاترین استانداردهای کیفی و تحت نظارت داروسازان مجرب عرضه می‌شود. قبل از مصرف با پزشک یا داروساز مشورت کنید.</p>
+        <p>{{ product.description|linebreaksbr }}</p>
       </div>
+      {% if product.usage_instructions %}
       <div id="panel-usage" class="info-panel">
-        <p>طبق دستور پزشک یا بروشور داخل بسته مصرف شود. از دوز توصیه‌شده تجاوز نکنید.</p>
+        <p>{{ product.usage_instructions|linebreaksbr }}</p>
       </div>
+      {% endif %}
+      {% if product.warnings %}
       <div id="panel-warn" class="info-panel">
-        <p>در دوران بارداری و شیردهی با پزشک مشورت کنید. در صورت بروز عوارض جانبی مصرف را متوقف و با داروساز تماس بگیرید.</p>
+        <p>{{ product.warnings|linebreaksbr }}</p>
       </div>
+      {% endif %}
     </div>
   </div>
 

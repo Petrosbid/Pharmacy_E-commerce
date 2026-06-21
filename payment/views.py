@@ -31,6 +31,7 @@ def request_payment(request):
 def verify_payment(request):
     authority = request.GET.get('Authority')
     status = request.GET.get('Status')
+    error_code = request.GET.get('Error')
 
     tx = get_object_or_404(Transaction, transaction_id=authority)
 
@@ -51,8 +52,26 @@ def verify_payment(request):
             messages.error(request, 'تایید تراکنش با خطا مواجه شد.')
     else:
         tx.status = 'failed'
+        
+        # Mapping error codes to user-friendly messages
+        error_messages = {
+            'insufficient_funds': 'موجودی حساب کافی نیست. لطفاً کارت دیگری انتخاب کرده یا موجودی حساب خود را افزایش دهید.',
+            'incorrect_pin': 'رمز دوم وارد شده نادرست است. لطفاً رمز کارت خود را مجدداً بررسی کنید.',
+            'expired_card': 'تاریخ انقضای کارت معتبر نیست یا کارت منقضی شده است.',
+            'system_timeout': 'ارتباط با بانک صادرکننده کارت برقرار نشد. چنانچه مبلغی کسر شده است، ظرف ۷۲ ساعت آینده به حساب شما بازگردانده می‌شود.',
+            'invalid_cvv2': 'کد امنیتی CVV2 نامعتبر است. لطفاً کد روی کارت را به درستی وارد کنید.',
+            'user_cancel': 'تراکنش توسط کاربر لغو گردید.',
+            'timer_expire': 'زمان مجاز برای انجام تراکنش به پایان رسید.',
+        }
+        
+        msg = error_messages.get(error_code, 'پرداخت توسط کاربر لغو شد یا با خطا مواجه شد.')
+        tx.callback_data = {
+            'success': False,
+            'error': error_code,
+            'message': msg
+        }
         tx.save()
-        messages.error(request, 'پرداخت توسط کاربر لغو شد یا با خطا مواجه شد.')
+        messages.error(request, msg)
 
     request.session['result_tx_id'] = tx.id
     return redirect('payment:result')

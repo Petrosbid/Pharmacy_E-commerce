@@ -25,22 +25,6 @@
     applyFilters();
 
 
-    const gridContainer = document.getElementById('product-grid');
-    if (gridContainer) {
-      gridContainer.addEventListener('click', function (e) {
-        const favBtn = e.target.closest('.product-favorite');
-
-        if (favBtn) {
-          e.preventDefault();
-          const productId = favBtn.getAttribute('data-fav-id');
-
-          favBtn.classList.toggle('active');
-
-          console.log(`محصول با شناسه ${productId} به علاقه‌مندی‌ها اضافه/حذف شد.`);
-
-        }
-      });
-    }
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();

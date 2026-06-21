@@ -62,8 +62,12 @@
                     </div>
                     
                     <h2 class="text-3xl font-black mb-4 text-[var(--color-text)]">خطا در فرآیند پرداخت</h2>
-                    <p class="text-[var(--color-text-secondary)] text-lg mb-8 leading-relaxed">
-                        متاسفانه تراکنش شما با خطا مواجه شد و یا توسط شما لغو گردید.
+                    <p class="text-[var(--color-danger)] text-lg mb-8 leading-relaxed font-bold">
+                        {% if transaction.callback_data.message %}
+                            {{ transaction.callback_data.message }}
+                        {% else %}
+                            متاسفانه تراکنش شما با خطا مواجه شد و یا توسط شما لغو گردید.
+                        {% endif %}
                     </p>
 
                     <div class="bg-[var(--color-danger)] bg-opacity-5 border border-[var(--color-danger)] border-opacity-20 rounded-[var(--radius-xl)] p-6 mb-8">

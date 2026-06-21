@@ -2462,3 +2462,73 @@ body {
   color: var(--color-primary);
 }
 
+/* Extended Product Info Styles */
+.product-specs-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.875rem;
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--color-bg-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.product-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.product-spec-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.product-spec-value {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.prescription-warning-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-lg);
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .prescription-warning-alert {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.prescription-warning-alert svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.prescription-warning-text {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.rx-badge {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="dark"] .rx-badge {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+}
+

@@ -14,7 +14,16 @@
     }
     
     document.getElementById('add-to-cart')?.addEventListener('click', () => { for (let i = 0; i < qty; i++) APF.addToCart(product.id); });
-    document.getElementById('add-favorite')?.addEventListener('click', function () { APF.toggleFavorite(product.id, this); this.classList.toggle('active'); });
+    
+    const favBtn = document.getElementById('add-favorite');
+    if (favBtn) {
+        if (APF.state.favorites.has(product.id)) {
+            favBtn.classList.add('active');
+        }
+        favBtn.addEventListener('click', function () {
+            APF.toggleFavorite(product.id, this);
+        });
+    }
 
     document.querySelectorAll('.info-tab').forEach(tab => {
       tab.addEventListener('click', () => {

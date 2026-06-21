@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}پیگیری سفارش | {{ site_name }}{% endblock %}
+{% block data_page %}order-tracking{% endblock %}
+{% block body_class %}inner-page{% endblock %}
+
+{% block content %}
+<div class="container-main py-10 max-w-4xl mx-auto">
+  
+  <nav class="breadcrumb mb-6" aria-label="مسیر">
+    <a href="{% url 'core:home' %}">خانه</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="{% url 'orders:history' %}">سفارشات من</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>پیگیری سفارش</span>
+  </nav>
+
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-black text-[var(--color-text)]">پیگیری و رصد سفارش</h1>
+    <p class="text-xs text-[var(--color-text-muted)] mt-2">شماره سفارش خود را وارد کنید تا وضعیت لحظه‌ای آن را مشاهده نمایید</p>
+  </div>
+
+  <!-- Search Bar Form -->
+  <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-6 shadow-sm mb-8 reveal">
+    <form method="get" action="{% url 'orders:tracking' %}" class="flex flex-col sm:flex-row gap-4">
+      <div class="flex-grow">
+        <label for="order-id-input" class="sr-only">شماره سفارش</label>
+        <div class="relative">
+          <input type="text" name="order_id" id="order-id-input" value="{{ order_id|default:'' }}" 
+                 placeholder="شماره سفارش خود را وارد کنید (مثال: ۱)" 
+                 class="w-full px-5 py-3.5 bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-xl text-right font-mono tracking-wider focus:outline-none focus:border-[var(--color-primary)] font-bold text-[var(--color-text)]"
+                 required autocomplete="off">
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
+            <i class="fas fa-hashtag"></i>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary px-8 py-3.5 flex items-center justify-center gap-2">
+        <i class="fas fa-search-location"></i>
+        <span>استعلام وضعیت</span>
+      </button>
+    </form>
+  </div>
+
+  {% if order_id %}
+    {% if order %}
+      
+      <!-- Order Found Details -->
+      <div class="space-y-6">
+        
+        <!-- Status Timeline (Progress Tracker) -->
+        <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-6 md:p-8 shadow-sm reveal">
+          <div class="flex justify-between items-center border-b pb-4 border-[var(--color-border)] mb-8">
+            <div>
+              <span class="text-xs text-[var(--color-text-muted)]">کد پیگیری تراکنش</span>
+              <h2 class="text-lg font-black text-[var(--color-text)] mt-0.5">سفارش شماره #{{ order.id }}</h2>
+            </div>
+            <div>
+              <span class="text-xs text-[var(--color-text-muted)] text-left block">وضعیت فعلی</span>
+              <strong class="text-[var(--color-primary)] font-black text-base">{{ order.get_status_display }}</strong>
+            </div>
+          </div>
+
+          {% if order.status == 'cancelled' %}
+            <div class="bg-red-50 border border-red-200 rounded-xl p-5 text-red-800 text-sm flex items-center gap-3 mb-6">
+              <i class="fas fa-times-circle text-red-600 fa-lg"></i>
+              <span class="font-bold">این سفارش لغو شده است. در صورت کسر وجه طی ۲۴ الی ۷۲ ساعت به حساب شما عودت داده می‌شود.</span>
+            </div>
+          {% else %}
+            <!-- Interactive visual timeline -->
+            <div class="relative py-4 flex flex-col md:flex-row justify-between items-center gap-y-8 md:gap-y-0">
+              
+              <!-- Connection Line (Desktop) -->
+              <div class="absolute right-0 left-0 top-1/2 -translate-y-1/2 h-1 bg-slate-200 hidden md:block z-0"></div>
+              <div class="absolute right-0 top-1/2 -translate-y-1/2 h-1 bg-[var(--color-primary)] hidden md:block z-0 transition-all duration-500"
+                   style="width: 
+                     {% if order.status == 'pending' %}12.5%
+                     {% elif order.status == 'paid' %}37.5%
+                     {% elif order.status == 'processing' %}62.5%
+                     {% elif order.status == 'shipping' %}87.5%
+                     {% elif order.status == 'delivered' %}100%{% endif %};">
+              </div>
+
+              <!-- Step 1: Registered -->
+              <div class="relative z-10 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2
+                  {% if order.status == 'pending' or order.status == 'paid' or order.status == 'processing' or order.status == 'shipping' or order.status == 'delivered' %}
+                    bg-[var(--color-primary)] text-white border-[var(--color-primary)]
+                  {% else %}
+                    bg-slate-100 text-slate-400 border-slate-200
+                  {% endif %}">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <span class="text-xs font-bold text-[var(--color-text)] mt-3">ثبت سفارش</span>
+                <span class="text-[9px] text-[var(--color-text-muted)] num-fa">{{ order.created_at|date:"H:i — Y/m/d" }}</span>
+              </div>
+
+              <!-- Step 2: Paid -->
+              <div class="relative z-10 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2
+                  {% if order.status == 'paid' or order.status == 'processing' or order.status == 'shipping' or order.status == 'delivered' %}
+                    bg-[var(--color-primary)] text-white border-[var(--color-primary)]
+                  {% else %}
+                    bg-slate-100 text-slate-400 border-slate-200
+                  {% endif %}">
+                  <i class="fas fa-wallet"></i>
+                </div>
+                <span class="text-xs font-bold text-[var(--color-text)] mt-3">تایید پرداخت</span>
+                <span class="text-[9px] text-[var(--color-text-muted)]">
+                  {% if order.payment_method == 'cod' %}پرداخت در محل
+                  {% elif order.status == 'pending' %}در انتظار پرداخت
+                  {% else %}پرداخت آنلاین{% endif %}
+                </span>
+              </div>
+
+              <!-- Step 3: Processing -->
+              <div class="relative z-10 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2
+                  {% if order.status == 'processing' or order.status == 'shipping' or order.status == 'delivered' %}
+                    bg-[var(--color-primary)] text-white border-[var(--color-primary)]
+                  {% else %}
+                    bg-slate-100 text-slate-400 border-slate-200
+                  {% endif %}">
+                  <i class="fas fa-box-open"></i>
+                </div>
+                <span class="text-xs font-bold text-[var(--color-text)] mt-3">آماده‌سازی</span>
+                <span class="text-[9px] text-[var(--color-text-muted)]">توسط داروسازان</span>
+              </div>
+
+              <!-- Step 4: Shipping -->
+              <div class="relative z-10 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2
+                  {% if order.status == 'shipping' or order.status == 'delivered' %}
+                    bg-[var(--color-primary)] text-white border-[var(--color-primary)]
+                  {% else %}
+                    bg-slate-100 text-slate-400 border-slate-200
+                  {% endif %}">
+                  <i class="fas fa-shipping-fast"></i>
+                </div>
+                <span class="text-xs font-bold text-[var(--color-text)] mt-3">ارسال مرسوله</span>
+                <span class="text-[9px] text-[var(--color-text-muted)]">تحویل به پیک/پست</span>
+              </div>
+
+              <!-- Step 5: Delivered -->
+              <div class="relative z-10 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2
+                  {% if order.status == 'delivered' %}
+                    bg-emerald-600 text-white border-emerald-600
+                  {% else %}
+                    bg-slate-100 text-slate-400 border-slate-200
+                  {% endif %}">
+                  <i class="fas fa-check"></i>
+                </div>
+                <span class="text-xs font-bold text-[var(--color-text)] mt-3">تحویل نهایی</span>
+                <span class="text-[9px] text-[var(--color-text-muted)]">سفارش دریافت شد</span>
+              </div>
+
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Details Grid -->
+        <div class="grid md:grid-cols-3 gap-6">
+          
+          <!-- Items detail table -->
+          <div class="md:col-span-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-6 shadow-sm reveal">
+            <h3 class="font-bold text-sm text-[var(--color-text)] border-b pb-3 border-[var(--color-border)] mb-4 flex items-center gap-2">
+              <i class="fas fa-shopping-basket text-[var(--color-primary)]"></i>
+              اقلام مرسوله
+            </h3>
+            
+            <div class="divide-y divide-[var(--color-border)]">
+              {% for item in order.items.all %}
+                <div class="py-4 flex justify-between items-center gap-4 {% if forloop.first %}pt-0{% endif %} {% if forloop.last %}pb-0{% endif %}">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-lg flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0">
+                      {% if item.product.images.exists %}
+                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="max-w-full max-h-full object-contain">
+                      {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+                          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <span class="font-bold text-xs text-[var(--color-text)]">{{ item.product.name|default:"محصول حذف شده" }}</span>
+                      <span class="block text-[10px] text-[var(--color-text-muted)] num-fa">{{ item.quantity }} عدد × {{ item.price|intcomma }} تومان</span>
+                    </div>
+                  </div>
+                  <div class="font-bold text-xs text-[var(--color-text)]">
+                    {{ item.get_cost|intcomma }} تومان
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <div class="border-t border-[var(--color-border)] mt-6 pt-4 space-y-2 text-xs text-[var(--color-text-secondary)]">
+              <div class="flex justify-between">
+                <span>هزینه اقلام سفارش</span>
+                <span class="num-fa">{% widthratio order.total_price|add:0 order.shipping_cost|add:0 1 as price %}{{ order.total_price|add:-order.shipping_cost|intcomma }} تومان</span>
+              </div>
+              <div class="flex justify-between">
+                <span>هزینه حمل و نقل</span>
+                <span class="num-fa">{{ order.shipping_cost|intcomma }} تومان</span>
+              </div>
+              <div class="flex justify-between font-bold text-sm text-[var(--color-text)] border-t pt-3 mt-2 border-[var(--color-border)]">
+                <span>مبلغ نهایی فاکتور</span>
+                <span class="text-[var(--color-primary)] font-black">{{ order.total_price|intcomma }} تومان</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Receiver address info sidebar -->
+          <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-6 shadow-sm reveal h-fit">
+            <h3 class="font-bold text-sm text-[var(--color-text)] border-b pb-3 border-[var(--color-border)] mb-4 flex items-center gap-2">
+              <i class="fas fa-truck text-[var(--color-primary)]"></i>
+              مشخصات تحویل سفارش
+            </h3>
+            
+            <div class="space-y-4 text-xs text-[var(--color-text-secondary)]">
+              <div>
+                <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">گیرنده مرسوله:</span>
+                <span class="font-bold text-[var(--color-text)]">{{ order.full_name }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">شماره تماس:</span>
+                <span class="font-bold text-[var(--color-text)] num-fa">{{ order.phone_number }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">روش ارسال:</span>
+                <span class="font-bold text-[var(--color-text)]">
+                  {% if order.shipping_method == 'express' %}ارسال اکسپرس پیکی{% else %}ارسال پستی پیشتاز{% endif %}
+                </span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">روش پرداخت:</span>
+                <span class="font-bold text-[var(--color-text)]">
+                  {% if order.payment_method == 'gateway' %}پرداخت آنلاین بانکی{% else %}پرداخت نقدی در محل{% endif %}
+                </span>
+              </div>
+              <div class="border-t border-[var(--color-border)] pt-3">
+                <span class="text-[10px] text-[var(--color-text-muted)] block mb-1">نشانی گیرنده:</span>
+                <span class="font-semibold text-[var(--color-text)] leading-relaxed block">{{ order.address }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    {% endif %}
+  {% endif %}
+
+</div>
+{% endblock %}
